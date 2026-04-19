@@ -24,7 +24,7 @@ const SFTP_CONFIG = {
   retry_minTimeout: 2000,
 }
 
-const REMOTE_DIR = process.env.REMOTE_DIR || '/home/general_account/stonewallfestavl.com'
+const REMOTE_DIR = process.env.REMOTE_DIR || '/home/general_account/avlstonewallfest.org'
 const LOCAL_DIR  = __dirname
 
 const args   = process.argv.slice(2)
