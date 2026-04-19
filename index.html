@@ -1,0 +1,1918 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AVL STONEWALL FEST — JUNE 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Playfair+Display:ital,wght@0,900;1,900&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+
+/* ─────────────────────────────────────────
+TOKENS
+───────────────────────────────────────── */
+:root {
+–ink:     #130e05;
+–paper:   #f2e8d0;
+–amber:   #d4870a;
+–rust:    #b83414;
+–olive:   #4b5320;
+–teal:    #0e5c5c;
+–mustard: #c9a72a;
+–cream:   #faf3e0;
+–charcoal:#1e1a12;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+background: var(–paper);
+color: var(–ink);
+font-family: ‘Space Mono’, monospace;
+overflow-x: hidden;
+}
+
+/* ── GRAIN ── */
+body::after {
+content: ‘’;
+position: fixed; inset: 0; z-index: 900; pointer-events: none;
+opacity: 0.055;
+background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 200 200’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘g’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.85’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23g)’/%3E%3C/svg%3E”);
+background-size: 180px;
+}
+
+/* ─────────────────────────────────────────
+NAV  — brutalist bar, paper bg
+───────────────────────────────────────── */
+nav {
+position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+display: flex; align-items: stretch;
+background: var(–ink);
+border-bottom: 4px solid var(–amber);
+height: 56px;
+}
+.nav-logo-block {
+display: flex; align-items: center;
+padding: 0 2rem;
+border-right: 4px solid var(–amber);
+background: var(–rust);
+}
+.nav-logo {
+font-family: ‘Archivo Black’, sans-serif;
+font-size: 1rem; letter-spacing: 0.1em; text-transform: uppercase;
+color: var(–cream); text-decoration: none; white-space: nowrap;
+}
+.nav-links {
+display: flex; list-style: none; margin-left: auto;
+}
+.nav-links li { border-left: 2px solid rgba(242,232,208,0.1); }
+.nav-links a {
+display: flex; align-items: center; height: 100%;
+padding: 0 1.6rem;
+font-family: ‘Archivo Black’, sans-serif; font-size: 0.95rem;
+letter-spacing: 0.12em; text-transform: uppercase;
+color: rgba(242,232,208,0.6); text-decoration: none;
+transition: background 0.15s, color 0.15s;
+}
+.nav-links a:hover { background: var(–amber); color: var(–ink); }
+
+/* ─────────────────────────────────────────
+HERO
+───────────────────────────────────────── */
+.hero {
+min-height: 100vh;
+background: var(–ink);
+display: grid;
+grid-template-rows: 1fr auto;
+padding-top: 56px;
+position: relative; overflow: hidden;
+}
+
+/* halftone dot bg */
+.hero-halftone {
+position: absolute; inset: 0; pointer-events: none; opacity: 0.07;
+background-image: radial-gradient(circle, var(–amber) 1px, transparent 1px);
+background-size: 28px 28px;
+}
+
+/* big diagonal color block */
+.hero-slab {
+position: absolute; right: -5vw; top: 0; bottom: 0;
+width: 46vw;
+background: var(–rust);
+clip-path: polygon(14% 0, 100% 0, 100% 100%, 0% 100%);
+opacity: 0.92;
+}
+.hero-slab-inner {
+position: absolute; right: -5vw; top: 0; bottom: 0;
+width: 46vw;
+clip-path: polygon(14% 0, 100% 0, 100% 100%, 0% 100%);
+display: flex; align-items: center; justify-content: center;
+padding-left: 14%;
+}
+
+/* concentric oval stamp */
+/* ── STONEWALL — one line, crisp rainbow echo ── */
+.ht-sw {
+display: block;
+white-space: nowrap;
+font-size: clamp(2.8rem, 7.8vw, 7.5rem);
+position: relative;
+color: transparent;
+-webkit-text-stroke: 3px var(–amber);
+clip-path: inset(0 100% 0 0);
+animation:
+swDraw    1.1s 0.6s cubic-bezier(0.16,1,0.3,1) forwards,
+swFlicker 0.3s  1.75s steps(1) 3 forwards;
+overflow: visible;
+}
+
+/* Echo 1 — rust, tight behind */
+.ht-sw::before {
+content: ‘STONEWALL’;
+position: absolute; left: 5px; top: 5px;
+white-space: nowrap; display: block;
+font-family: inherit; font-size: inherit; letter-spacing: inherit;
+color: transparent;
+-webkit-text-stroke: 3px var(–rust);
+opacity: 0; z-index: -1; pointer-events: none;
+transition: opacity 0.3s 1.6s ease;
+}
+/* Echo 2 — olive/teal, further back */
+.ht-sw::after {
+content: ‘STONEWALL’;
+position: absolute; left: 10px; top: 10px;
+white-space: nowrap; display: block;
+font-family: inherit; font-size: inherit; letter-spacing: inherit;
+color: transparent;
+-webkit-text-stroke: 2px #0e5c5c;
+opacity: 0; z-index: -2; pointer-events: none;
+transition: opacity 0.3s 1.75s ease;
+}
+
+/* triggered by JS adding .echoes-on */
+.ht-sw.echoes-on::before { opacity: 0.85; }
+.ht-sw.echoes-on::after  { opacity: 0.7; }
+
+@keyframes swDraw {
+0%   { clip-path: inset(0 100% 0 0); }
+100% { clip-path: inset(0 0%   0 0); }
+}
+@keyframes swFlicker {
+0%,100% { opacity: 1; }
+33%     { opacity: 0.1; }
+66%     { opacity: 1; }
+}
+
+/* ── STAMP spin + year count-up ── */
+.stamp-ring {
+width: clamp(200px, 28vw, 380px);
+height: clamp(200px, 28vw, 380px);
+border-radius: 50%;
+border: 3px solid rgba(242,232,208,0.3);
+position: relative; display: flex; align-items: center; justify-content: center;
+animation: stampSpin 3.0s 0.3s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes stampSpin {
+0%   { transform: rotate(-480deg) scale(0.5); opacity: 0; }
+75%  { transform: rotate(8deg)    scale(1.03); opacity: 1; }
+90%  { transform: rotate(-3deg)   scale(0.99); }
+100% { transform: rotate(0deg)    scale(1);    opacity: 1; }
+}
+.stamp-ring::before {
+content: ‘’;
+position: absolute; inset: 14px;
+border-radius: 50%; border: 2px solid rgba(242,232,208,0.18);
+animation: ringRotate 20s linear infinite;
+}
+.stamp-ring::after {
+content: ‘’;
+position: absolute; inset: 30px;
+border-radius: 50%; border: 1px dashed rgba(242,232,208,0.1);
+animation: ringRotate 12s linear infinite reverse;
+}
+@keyframes ringRotate {
+from { transform: rotate(0deg); }
+to   { transform: rotate(360deg); }
+}
+.stamp-inner {
+text-align: center; padding: 1rem; position: relative; z-index: 2;
+}
+.stamp-year {
+font-family: ‘Archivo Black’, sans-serif;
+font-size: clamp(3rem, 8vw, 7rem);
+line-height: 1; letter-spacing: -0.02em;
+color: var(–cream);
+display: block;
+}
+.stamp-sub {
+font-family: ‘Space Mono’, monospace;
+font-size: 0.8rem; letter-spacing: 0.25em; text-transform: uppercase;
+color: rgba(242,232,208,0.55); margin-top: 0.4rem;
+}
+
+/* main title block */
+.hero-body {
+display: flex; flex-direction: column; justify-content: center;
+padding: 5vw 6vw 4vw;
+position: relative; z-index: 2;
+max-width: 66vw;
+}
+
+.hero-kicker {
+font-family: ‘Space Mono’, monospace;
+font-size: 0.95rem; letter-spacing: 0.22em; text-transform: uppercase;
+color: var(–amber); margin-bottom: 1.8rem;
+display: flex; align-items: center; gap: 1rem;
+}
+.hero-kicker::before { content: ‘’; display: inline-block; width: 2rem; height: 2px; background: var(–amber); }
+
+.hero-title {
+font-family: ‘Archivo Black’, sans-serif;
+font-size: clamp(4rem, 11vw, 10.5rem);
+line-height: 0.92; letter-spacing: -0.02em;
+text-transform: uppercase;
+}
+.ht-avl  { color: var(–cream); display: block; }
+.ht-sw   {
+display: block; color: transparent;
+-webkit-text-stroke: 3px var(–amber);
+position: relative;
+}
+/* shadow double */
+.ht-sw::before {
+content: ‘STONEWALL’;
+position: absolute; left: 5px; top: 5px;
+color: transparent; -webkit-text-stroke: 3px var(–rust);
+opacity: 0.4; z-index: -1;
+}
+.ht-fest { color: var(–rust); display: block; }
+
+/* date badge */
+.date-badge {
+margin-top: 3rem;
+display: inline-flex; flex-direction: column; gap: 0.4rem;
+border-left: 5px solid var(–amber);
+padding-left: 1.4rem;
+}
+.date-badge .db-3day {
+font-family: ‘Archivo Black’, sans-serif;
+font-size: clamp(1.8rem, 4.5vw, 4rem);
+line-height: 1; letter-spacing: 0.06em; text-transform: uppercase;
+color: var(–amber);
+}
+.date-badge .db-main {
+font-family: ‘Archivo Black’, sans-serif;
+font-size: clamp(1.1rem, 2.5vw, 2rem);
+line-height: 1.1; color: var(–cream); letter-spacing: -0.01em;
+opacity: 0.75;
+}
+.date-badge .db-main sup { font-size: 0.45em; color: var(–rust); vertical-align: super; }
+.date-badge .db-loc {
+font-family: ‘Archivo Black’, sans-serif;
+font-size: clamp(1rem, 2vw, 1.5rem);
+letter-spacing: 0.06em; text-transform: uppercase;
+color: rgba(242,232,208,0.65); margin-top: 0.6rem;
+}
+
+/* bottom CTA bar */
+.hero-footer {
+border-top: 2px solid rgba(242,232,208,0.1);
+display: flex; align-items: center; justify-content: space-between;
+padding: 1.6rem 6vw;
+position: relative; z-index: 2;
+gap: 2rem;
+}
+.hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+.btn {
+display: inline-block; text-decoration: none; cursor: pointer;
+font-family: ‘Archivo Black’, sans-serif; font-size: 0.95rem;
+letter-spacing: 0.1em; text-transform: uppercase;
+padding: 0.9rem 2rem; border: 3px solid; transition: all 0.18s;
+}
+.btn-filled { background: var(–amber); color: var(–ink); border-color: var(–amber); }
+.btn-filled:hover { background: var(–rust); border-color: var(–rust); color: var(–cream); }
+.btn-ghost  { background: transparent; color: var(–cream); border-color: rgba(242,232,208,0.35); }
+.btn-ghost:hover { border-color: var(–amber); color: var(–amber); }
+
+.hero-tagline {
+font-family: ‘Playfair Display’, serif;
+font-size: clamp(0.9rem, 1.4vw, 1.15rem);
+font-style: italic; line-height: 1.6;
+color: rgba(242,232,208,0.45); text-align: right; max-width: 28ch;
+}
+
+/* ─────────────────────────────────────────
+RAINBOW + TICKER
+───────────────────────────────────────── */
+.pride-bar {
+display: flex; height: 10px;
+}
+.pride-bar div { flex: 1; }
+
+.ticker {
+background: var(–rust);
+border-bottom: 3px solid var(–ink);
+overflow: hidden; padding: 0.75rem 0;
+}
+.ticker-track {
+display: inline-flex; white-space: nowrap;
+animation: scrolltick 30s linear infinite;
+}
+.ticker-track span {
+font-family: ‘Archivo Black’, sans-serif; font-size: 1rem;
+letter-spacing: 0.1em; text-transform: uppercase;
+color: var(–cream); padding: 0 2rem;
+}
+.ticker-track .bull { color: var(–amber); padding: 0 0.5rem; }
+@keyframes scrolltick { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ─────────────────────────────────────────
+SECTION UTILITY
+───────────────────────────────────────── */
+.sec-tag {
+font-family: ‘Space Mono’, monospace;
+font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase;
+display: flex; align-items: center; gap: 0.8rem; margin-bottom: 2.5rem;
+}
+.sec-tag::before { content: ‘◆’; font-size: 0.7rem; }
+.sec-tag::after  { content: ‘’; flex: 0 0 1.5rem; height: 2px; }
+
+/* ─────────────────────────────────────────
+ABOUT  — dot-matrix canvas bg
+───────────────────────────────────────── */
+.about {
+position: relative;
+color: var(–paper);
+padding: 8rem 6vw;
+display: grid; grid-template-columns: 1fr 1fr; gap: 7rem; align-items: start;
+overflow: hidden;
+background: #0a0703;
+}
+
+/* canvas sits full-bleed behind everything */
+#dotMatrix {
+position: absolute; inset: 0;
+width: 100%; height: 100%;
+z-index: 0;
+display: block;
+}
+
+/* overlay — light enough to see scenes, dark enough for text */
+.about-overlay {
+position: absolute; inset: 0; z-index: 1;
+background: linear-gradient(
+135deg,
+rgba(10,7,3,0.52) 0%,
+rgba(10,7,3,0.35) 50%,
+rgba(10,7,3,0.48) 100%
+);
+}
+
+.about .sec-tag  { color: var(–amber); position: relative; z-index: 2; }
+.about .sec-tag::after { background: var(–amber); }
+.about-left      { position: sticky; top: 6rem; z-index: 2; }
+.about-right     { position: relative; z-index: 2; }
+
+.about-left h2 {
+font-family: ‘Archivo Black’, sans-serif;
+font-size: clamp(2.8rem, 5.5vw, 5rem); text-transform: uppercase;
+line-height: 0.9; letter-spacing: -0.02em;
+}
+.about-left h2 .hi { color: var(–amber); display: block; }
+.about-left h2 .lo {
+display: block; color: transparent;
+-webkit-text-stroke: 2px rgba(242,232,208,0.25);
+}
+
+/* year stamp badge */
+.year-stamp {
+margin-top: 3rem; display: inline-flex; flex-direction: column;
+align-items: center; justify-content: center;
+width: 180px; height: 180px; border-radius: 50%;
+border: 3px solid var(–amber);
+box-shadow: 0 0 0 8px rgba(212,135,10,0.08), 0 0 0 16px rgba(212,135,10,0.04);
+text-align: center;
+background: rgba(10,7,3,0.55);
+backdrop-filter: blur(4px);
+}
+.year-stamp .ys-since {
+font-family: ‘Space Mono’, monospace; font-size: 0.78rem;
+letter-spacing: 0.22em; text-transform: uppercase; color: rgba(242,232,208,0.5);
+}
+.year-stamp .ys-year {
+font-family: ‘Archivo Black’, sans-serif; font-size: 3.2rem;
+line-height: 1; color: var(–amber); letter-spacing: -0.02em;
+}
+.year-stamp .ys-avl {
+font-family: ‘Space Mono’, monospace; font-size: 0.78rem;
+letter-spacing: 0.22em; text-transform: uppercase; color: var(–rust);
+}
+
+.about-right p {
+font-family: ‘Inter’, sans-serif;
+font-size: 1.05rem; font-weight: 300; line-height: 1.95;
+color: rgba(242,232,208,0.72); margin-bottom: 1.6rem;
+}
+.about-right p strong { color: var(–paper); font-weight: 600; }
+
+.blockquote {
+margin: 2.8rem 0; padding: 2.2rem 2.5rem;
+background: var(–rust); position: relative;
+}
+.blockquote::before {
+content: ‘\201C’; font-family: ‘Playfair Display’, serif;
+font-size: 7rem; line-height: 0.6; color: rgba(242,232,208,0.15);
+position: absolute; top: 1.2rem; left: 1.4rem;
+}
+.blockquote p {
+font-family: ‘Playfair Display’, serif !important;
+font-size: 1.3rem !important; font-style: italic;
+line-height: 1.55 !important; color: var(–cream) !important;
+margin: 0 !important; position: relative; z-index: 1;
+}
+
+/* ─────────────────────────────────────────
+PARTICIPATE  — paper bg
+───────────────────────────────────────── */
+.participate {
+background: var(–cream);
+color: var(–ink);
+padding: 8rem 6vw;
+}
+.participate .sec-tag { color: var(–olive); }
+.participate .sec-tag::after { background: var(–olive); }
+
+.part-head {
+display: grid; grid-template-columns: auto 1fr; gap: 4rem; align-items: end;
+margin-bottom: 5rem;
+}
+.part-head h2 {
+font-family: ‘Archivo Black’, sans-serif;
+font-size: clamp(3rem, 6vw, 5.5rem);
+text-transform: uppercase; line-height: 0.9; letter-spacing: -0.02em;
+}
+.part-head h2 em { color: var(–rust); font-style: normal; display: block; }
+.part-head p {
+font-family: ‘Inter’, sans-serif; font-size: 1rem;
+font-weight: 300; line-height: 1.8; color: rgba(19,14,5,0.55);
+max-width: 40ch; padding-bottom: 0.4rem;
+}
+
+.cards {
+display: grid; grid-template-columns: repeat(4,1fr);
+border: 3px solid var(–ink);
+}
+.card {
+padding: 2.8rem 2rem;
+border-right: 3px solid var(–ink);
+display: flex; flex-direction: column;
+position: relative; transition: background 0.2s, color 0.2s;
+}
+.card:last-child { border-right: none; }
+.card:hover { background: var(–ink); color: var(–paper); }
+.card:hover .card-body { color: rgba(242,232,208,0.65); }
+.card:hover .card-price { background: var(–amber); color: var(–ink); border-color: var(–amber); }
+.card:hover .card-num { color: rgba(242,232,208,0.06); }
+
+.card-num {
+font-family: ‘Archivo Black’, sans-serif; font-size: 5rem;
+color: rgba(19,14,5,0.05); line-height: 1;
+position: absolute; top: 0.8rem; right: 1rem; user-select: none;
+transition: color 0.2s;
+}
+.card-accent { height: 4px; margin-bottom: 2rem; }
+.card h3 {
+font-family: ‘Archivo Black’, sans-serif;
+font-size: 1.3rem; text-transform: uppercase;
+letter-spacing: 0.02em; line-height: 1.1; margin-bottom: 1.2rem;
+}
+.card-body {
+font-family: ‘Inter’, sans-serif;
+font-size: 1.02rem; line-height: 1.8;
+color: rgba(19,14,5,0.6); margin-bottom: 2rem; flex: 1;
+transition: color 0.2s;
+}
+.card-price {
+font-family: ‘Archivo Black’, sans-serif; font-size: 1rem;
+letter-spacing: 0.08em; text-transform: uppercase;
+padding: 0.65rem 1.3rem;
+border: 3px solid var(–ink); display: inline-block;
+align-self: flex-start; transition: all 0.2s;
+}
+
+/* ─────────────────────────────────────────
+SCHEDULE  — ink bg, 3 columns
+───────────────────────────────────────── */
+.schedule {
+background: var(–ink);
+color: var(–paper);
+padding: 8rem 6vw;
+}
+.schedule .sec-tag { color: var(–amber); }
+.schedule .sec-tag::after { background: var(–amber); }
+
+.schedule-header {
+margin-bottom: 5rem;
+}
+.schedule-header h2 {
+font-family: ‘Archivo Black’, sans-serif;
+font-size: clamp(2.2rem, 5vw, 4rem);
+text-transform: uppercase; line-height: 0.9; letter-spacing: -0.02em;
+}
+.schedule-header h2 em { color: var(–amber); font-style: normal; display: block; }
+.schedule-header h2 .dates-line {
+display: block;
+font-size: 0.52em;
+color: rgba(242,232,208,0.35);
+letter-spacing: 0.04em;
+margin-top: 0.5rem;
+-webkit-text-stroke: 0;
+}
+
+.sched-grid {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+border: 3px solid rgba(242,232,208,0.12);
+}
+
+.sched-day {
+border-right: 3px solid rgba(242,232,208,0.12);
+display: flex; flex-direction: column;
+}
+.sched-day:last-child { border-right: none; }
+
+/* day header bar */
+.sched-day-header {
+padding: 1.8rem 2.2rem;
+border-bottom: 3px solid rgba(242,232,208,0.12);
+position: sticky; top: 56px; z-index: 10;
+}
+.sched-day-header.fri { background: var(–rust); }
+.sched-day-header.sat { background: var(–olive); }
+.sched-day-header.sun { background: var(–teal); }
+
+.sched-day-num {
+font-family: ‘Archivo Black’, sans-serif;
+font-size: clamp(3rem, 5vw, 5rem); line-height: 1;
+color: var(–cream); letter-spacing: -0.03em;
+}
+.sched-day-label {
+font-family: ‘Space Mono’, monospace;
+font-size: 0.8rem; letter-spacing: 0.18em; text-transform: uppercase;
+color: rgba(242,232,208,0.65); margin-top: 0.2rem;
+}
+
+/* events list */
+.sched-events {
+padding: 0; flex: 1;
+}
+
+.sched-event {
+padding: 2.2rem 2.2rem;
+border-bottom: 2px solid rgba(242,232,208,0.07);
+position: relative;
+}
+.sched-event:last-child { border-bottom: none; }
+
+.sched-event-time {
+font-family: ‘Space Mono’, monospace;
+font-size: 0.82rem; letter-spacing: 0.15em; text-transform: uppercase;
+color: var(–amber); margin-bottom: 0.7rem;
+display: flex; align-items: center; gap: 0.6rem;
+}
+.sched-event-time::before {
+content: ‘’; display: inline-block;
+width: 6px; height: 6px; border-radius: 50%;
+background: var(–amber); flex-shrink: 0;
+}
+.sched-event-time.sat-night { color: var(–mustard); }
+.sched-event-time.sat-night::before { background: var(–mustard); }
+
+.sched-event h3 {
+font-family: ‘Archivo Black’, sans-serif;
+font-size: 1.15rem; text-transform: uppercase;
+line-height: 1.1; color: var(–cream); margin-bottom: 0.7rem;
+}
+.sched-event p {
+font-family: ‘Inter’, sans-serif;
+font-size: 1rem; line-height: 1.75;
+color: rgba(242,232,208,0.55);
+}
+.sched-event p strong {
+color: rgba(242,232,208,0.85); font-weight: 600;
+}
+.free-badge {
+display: inline-block; margin-top: 1rem;
+font-family: ‘Archivo Black’, sans-serif; font-size: 1rem;
+letter-spacing: 0.1em; text-transform: uppercase;
+padding: 0.35rem 0.9rem;
+background: var(–rust); color: var(–cream);
+}
+
+@media (max-width: 900px) {
+.sched-grid { grid-template-columns: 1fr; }
+.sched-day { border-right: none; border-bottom: 3px solid rgba(242,232,208,0.12); }
+.sched-day:last-child { border-bottom: none; }
+.sched-day-header { position: static; }
+}
+
+/* ─────────────────────────────────────────
+SPONSORS  — amber bg, ink text
+───────────────────────────────────────── */
+.sponsors {
+background: var(–amber);
+color: var(–ink);
+padding: 8rem 6vw;
+}
+.sponsors .sec-tag { color: var(–ink); opacity: 0.5; }
+.sponsors .sec-tag::after { background: var(–ink); opacity: 0.4; }
+
+.sponsors h2 {
+font-family: ‘Archivo Black’, sans-serif;
+font-size: clamp(2.8rem, 6vw, 5.5rem);
+text-transform: uppercase; line-height: 0.9; letter-spacing: -0.02em;
+margin-bottom: 1.2rem;
+}
+.sponsors h2 span {
+display: block; color: transparent;
+-webkit-text-stroke: 3px var(–ink);
+}
+.sponsors-intro {
+font-family: ‘Inter’, sans-serif; font-size: 1rem; font-weight: 300;
+line-height: 1.8; max-width: 55ch; margin-bottom: 4.5rem;
+color: rgba(19,14,5,0.6);
+}
+
+.tiers {
+display: grid; grid-template-columns: repeat(4,1fr);
+border: 3px solid var(–ink); margin-bottom: 3px;
+}
+.tier {
+padding: 3rem 2rem; text-align: center;
+border-right: 3px solid var(–ink);
+transition: background 0.2s, color 0.2s;
+}
+.tier:last-child { border-right: none; }
+.tier:hover { background: var(–ink); color: var(–amber); }
+.tier:hover .tier-name { color: rgba(212,135,10,0.6); }
+.tier:hover .tier-desc { color: rgba(212,135,10,0.5); }
+.tier-name {
+font-family: ‘Space Mono’, monospace; font-size: 0.82rem;
+letter-spacing: 0.18em; text-transform: uppercase;
+color: rgba(19,14,5,0.45); margin-bottom: 1rem; transition: color 0.2s;
+}
+.tier-amt {
+font-family: ‘Archivo Black’, sans-serif;
+font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1;
+color: var(–ink); margin-bottom: 0.8rem; transition: color 0.2s;
+}
+.tier:hover .tier-amt { color: var(–amber); }
+.tier-desc {
+font-family: ‘Inter’, sans-serif; font-size: 0.95rem; line-height: 1.7;
+color: rgba(19,14,5,0.5); transition: color 0.2s;
+}
+
+.circle-row {
+border: 3px solid var(–ink);
+display: flex; align-items: center; justify-content: space-between;
+padding: 2.5rem 2.8rem; gap: 2rem;
+background: var(–ink);
+}
+.circle-row h3 {
+font-family: ‘Archivo Black’, sans-serif;
+font-size: 1.5rem; text-transform: uppercase; color: var(–amber);
+}
+.circle-row p {
+font-family: ‘Inter’, sans-serif; font-size: 1rem;
+color: rgba(242,232,208,0.45); max-width: 36ch; line-height: 1.75;
+}
+.circle-price {
+font-family: ‘Archivo Black’, sans-serif;
+font-size: clamp(2.5rem, 4vw, 4rem); color: var(–amber); white-space: nowrap;
+}
+
+/* ─────────────────────────────────────────
+DONATE  — dark paper
+───────────────────────────────────────── */
+.donate {
+background: var(–charcoal);
+color: var(–paper);
+padding: 9rem 6vw;
+text-align: center;
+position: relative; overflow: hidden;
+}
+/* big ghost text */
+.donate::before {
+content: ‘1969’;
+position: absolute; inset: 0;
+display: flex; align-items: center; justify-content: center;
+font-family: ‘Archivo Black’, sans-serif;
+font-size: clamp(10rem, 28vw, 24rem);
+color: rgba(242,232,208,0.03);
+pointer-events: none; user-select: none; letter-spacing: -0.04em;
+}
+.donate .sec-tag { justify-content: center; color: var(–amber); }
+.donate .sec-tag::after { background: var(–amber); }
+
+.donate h2 {
+font-family: ‘Archivo Black’, sans-serif;
+font-size: clamp(2.8rem, 6vw, 5.5rem);
+text-transform: uppercase; line-height: 0.9; letter-spacing: -0.02em;
+margin-bottom: 1.4rem;
+}
+.donate h2 em { color: var(–rust); font-style: normal; }
+.donate > p {
+font-family: ‘Inter’, sans-serif; font-size: 1.05rem; font-weight: 300;
+line-height: 1.85; color: rgba(242,232,208,0.55);
+max-width: 48ch; margin: 0 auto 4rem;
+}
+.amounts {
+display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap;
+margin-bottom: 2.8rem;
+}
+.amt {
+font-family: ‘Archivo Black’, sans-serif; font-size: 1.05rem;
+letter-spacing: 0.08em; text-transform: uppercase;
+padding: 0.9rem 2rem; background: transparent;
+border: 3px solid rgba(242,232,208,0.2); color: rgba(242,232,208,0.5);
+cursor: pointer; transition: all 0.18s;
+}
+.amt:hover, .amt.on {
+background: var(–rust); color: var(–cream); border-color: var(–rust);
+}
+.btn-give {
+display: inline-block; padding: 1.2rem 4.5rem;
+background: var(–amber); color: var(–ink);
+font-family: ‘Archivo Black’, sans-serif; font-size: 1rem;
+letter-spacing: 0.1em; text-transform: uppercase;
+border: 3px solid var(–amber); cursor: pointer;
+transition: all 0.18s; text-decoration: none;
+}
+.btn-give:hover {
+background: var(–rust); border-color: var(–rust); color: var(–cream);
+transform: translateY(-2px);
+}
+
+/* ─────────────────────────────────────────
+FOOTER
+───────────────────────────────────────── */
+.rainbow-bar {
+height: 8px;
+background: linear-gradient(to right,
+#E40303 0 14.28%, #FF8C00 14.28% 28.57%, #FFED00 28.57% 42.85%,
+#008026 42.85% 57.14%, #004DFF 57.14% 71.43%, #750787 71.43% 100%);
+}
+footer {
+background: var(–ink);
+padding: 6rem 6vw 3rem;
+display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 4rem;
+}
+.footer-logo {
+font-family: ‘Archivo Black’, sans-serif;
+font-size: 1.4rem; text-transform: uppercase; letter-spacing: 0.06em;
+color: var(–amber); margin-bottom: 1.2rem;
+}
+.footer-tagline {
+font-family: ‘Inter’, sans-serif; font-size: 0.95rem; line-height: 1.8;
+color: rgba(242,232,208,0.28); max-width: 28ch;
+}
+.footer-col h4 {
+font-family: ‘Space Mono’, monospace; font-size: 0.8rem;
+letter-spacing: 0.18em; text-transform: uppercase;
+color: var(–amber); margin-bottom: 1.5rem;
+}
+.footer-col ul { list-style: none; }
+.footer-col li { margin-bottom: 0.7rem; }
+.footer-col a {
+font-family: ‘Inter’, sans-serif; font-size: 1rem;
+color: rgba(242,232,208,0.32); text-decoration: none; transition: color 0.2s;
+}
+.footer-col a:hover { color: var(–paper); }
+.footer-bottom {
+grid-column: 1 / -1; padding-top: 3rem; margin-top: 1rem;
+border-top: 1px solid rgba(242,232,208,0.07);
+display: flex; justify-content: space-between; align-items: center;
+}
+.footer-bottom p {
+font-family: ‘Space Mono’, monospace; font-size: 0.8rem;
+letter-spacing: 0.1em; color: rgba(242,232,208,0.18);
+}
+
+/* ─────────────────────────────────────────
+RESPONSIVE
+───────────────────────────────────────── */
+@media (max-width: 1000px) {
+.hero-slab, .hero-slab-inner { display: none; }
+.hero-body { max-width: 100%; }
+.about { grid-template-columns: 1fr; gap: 4rem; }
+.about-left { position: static; }
+.part-head { grid-template-columns: 1fr; gap: 2rem; }
+.cards { grid-template-columns: 1fr 1fr; }
+.cards .card:nth-child(2) { border-right: none; }
+.cards .card:nth-child(3) { border-top: 3px solid var(–ink); }
+.cards .card:nth-child(4) { border-top: 3px solid var(–ink); border-right: none; }
+.tiers { grid-template-columns: 1fr 1fr; }
+.tiers .tier:nth-child(2) { border-right: none; }
+.tiers .tier:nth-child(3) { border-top: 3px solid var(–ink); }
+.tiers .tier:nth-child(4) { border-top: 3px solid var(–ink); border-right: none; }
+footer { grid-template-columns: 1fr; }
+.footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+.circle-row { flex-direction: column; text-align: center; }
+}
+@media (max-width: 640px) {
+nav .nav-links { display: none; }
+.cards { grid-template-columns: 1fr; }
+.cards .card { border-right: none; border-top: 3px solid var(–ink); }
+.cards .card:first-child { border-top: none; }
+.tiers { grid-template-columns: 1fr; }
+.tiers .tier { border-right: none; border-top: 3px solid var(–ink); }
+.tiers .tier:first-child { border-top: none; }
+.hero-footer { flex-direction: column; align-items: flex-start; }
+.hero-tagline { text-align: left; }
+}
+
+/* ─────────────────────────────────────────
+LOAD ANIMATIONS
+───────────────────────────────────────── */
+@keyframes riseIn {
+from { opacity: 0; transform: translateY(32px); }
+to   { opacity: 1; transform: translateY(0); }
+}
+.hero-kicker { animation: riseIn 0.6s 0.1s ease both; }
+.hero-title  { animation: riseIn 0.8s 0.25s ease both; }
+.date-badge  { animation: riseIn 0.6s 0.5s ease both; }
+.hero-footer { animation: riseIn 0.6s 0.65s ease both; }
+
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+
+<nav>
+  <div class="nav-logo-block">
+    <a href="#" class="nav-logo">AVL Stonewall Fest</a>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#about">Story</a></li>
+    <li><a href="#schedule">Schedule</a></li>
+    <li><a href="#join">Join</a></li>
+    <li><a href="#sponsors">Sponsors</a></li>
+    <li><a href="#donate">Give</a></li>
+  </ul>
+</nav>
+
+<!-- ── HERO ── -->
+
+<section class="hero" id="top">
+  <div class="hero-halftone"></div>
+
+  <!-- right diagonal slab with stamp -->
+
+  <div class="hero-slab"></div>
+  <div class="hero-slab-inner">
+    <div class="stamp-ring">
+      <div class="stamp-inner">
+        <div class="stamp-year" id="stampYear">1969</div>
+        <div class="stamp-sub" id="stampSub">Stonewall · NYC</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- main content -->
+
+  <div class="hero-body">
+    <div class="hero-kicker">Asheville, NC — June 2026</div>
+
+```
+<h1 class="hero-title">
+  <span class="ht-avl">AVL</span>
+  <span class="ht-sw">STONEWALL</span>
+  <span class="ht-fest">FEST</span>
+</h1>
+
+<div class="date-badge">
+  <div class="db-3day">3-Day Event</div>
+  <div class="db-main">
+    26<sup>th</sup> · 27<sup>th</sup> · 28<sup>th</sup> June 2026
+  </div>
+  <div class="db-loc">Asheville, North Carolina</div>
+</div>
+```
+
+  </div>
+
+  <div class="hero-footer">
+    <div class="hero-ctas">
+      <a href="#join"     class="btn btn-filled">RSVP + Details</a>
+      <a href="#sponsors" class="btn btn-ghost">Become a Sponsor</a>
+    </div>
+    <p class="hero-tagline">
+      Asheville's first June Pride festival.<br>
+      Rooted in resistance.<br>Built for everyone.
+    </p>
+  </div>
+</section>
+
+<!-- rainbow + ticker -->
+
+<div class="pride-bar">
+  <div style="background:#E40303"></div>
+  <div style="background:#FF8C00"></div>
+  <div style="background:#FFED00"></div>
+  <div style="background:#008026"></div>
+  <div style="background:#004DFF"></div>
+  <div style="background:#750787"></div>
+</div>
+<div class="ticker">
+  <div class="ticker-track">
+    <span>Vendors</span><span class="bull">✦</span>
+    <span>Artists</span><span class="bull">✦</span>
+    <span>Food Trucks</span><span class="bull">✦</span>
+    <span>Live Performances</span><span class="bull">✦</span>
+    <span>Nonprofits</span><span class="bull">✦</span>
+    <span>Volunteers</span><span class="bull">✦</span>
+    <span>Sponsors</span><span class="bull">✦</span>
+    <span>Embrace Diversity</span><span class="bull">✦</span>
+    <span>Celebrate Everyone</span><span class="bull">✦</span>
+    <!-- loop -->
+    <span>Vendors</span><span class="bull">✦</span>
+    <span>Artists</span><span class="bull">✦</span>
+    <span>Food Trucks</span><span class="bull">✦</span>
+    <span>Live Performances</span><span class="bull">✦</span>
+    <span>Nonprofits</span><span class="bull">✦</span>
+    <span>Volunteers</span><span class="bull">✦</span>
+    <span>Sponsors</span><span class="bull">✦</span>
+    <span>Embrace Diversity</span><span class="bull">✦</span>
+    <span>Celebrate Everyone</span><span class="bull">✦</span>
+  </div>
+</div>
+
+<!-- ── SCHEDULE ── -->
+
+<section class="schedule" id="schedule">
+  <div class="sec-tag">Full Schedule</div>
+  <div class="schedule-header">
+    <h2>
+      <em>3-Day Event</em>
+      <span class="dates-line">26<sup>th</sup> · 27<sup>th</sup> · 28<sup>th</sup> June 2026 · Asheville, NC</span>
+    </h2>
+  </div>
+
+  <div class="sched-grid">
+
+```
+<!-- ── FRIDAY ── -->
+<div class="sched-day">
+  <div class="sched-day-header fri">
+    <div class="sched-day-num">26</div>
+    <div class="sched-day-label">Friday · June 26th</div>
+  </div>
+  <div class="sched-events">
+    <div class="sched-event">
+      <div class="sched-event-time">Evening</div>
+      <h3>Stonewall Drag Show</h3>
+      <p>
+        <strong>O'Henry's</strong> — NC's oldest bar, celebrating
+        <strong>50 years</strong> this year. A legendary night to kick off
+        the weekend in style.
+      </p>
+      <div class="free-badge">Free Event</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SATURDAY ── -->
+<div class="sched-day">
+  <div class="sched-day-header sat">
+    <div class="sched-day-num">27</div>
+    <div class="sched-day-label">Saturday · June 27th</div>
+  </div>
+  <div class="sched-events">
+    <div class="sched-event">
+      <div class="sched-event-time">2 PM – 8 PM</div>
+      <h3>Festival Main Event</h3>
+      <p>
+        The heart of AVL Stonewall Fest. Live performances, vendors,
+        artists, food trucks, and the full community at
+        <strong>Asheville Yards</strong>.
+      </p>
+    </div>
+    <div class="sched-event">
+      <div class="sched-event-time sat-night">10 PM – 2 AM</div>
+      <h3>Stonewall Dance Party</h3>
+      <p>
+        Keep the night alive at <strong>O'Henry's back room</strong>.
+        The after-party Asheville has been waiting for.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ── SUNDAY ── -->
+<div class="sched-day">
+  <div class="sched-day-header sun">
+    <div class="sched-day-num">28</div>
+    <div class="sched-day-label">Sunday · June 28th</div>
+  </div>
+  <div class="sched-events">
+    <div class="sched-event">
+      <div class="sched-event-time">Brunch</div>
+      <h3>Drag Brunch</h3>
+      <p>
+        Produced by <strong>Asheville Drag Brunch</strong> at
+        <strong>New Belgium</strong>. The ultimate Sunday send-off.
+      </p>
+    </div>
+    <div class="sched-event">
+      <div class="sched-event-time">Afternoon</div>
+      <h3>Beer City Bears</h3>
+      <p>
+        Community gathering at <strong>Shakey's</strong>. 
+        A chill afternoon with good people.
+      </p>
+    </div>
+    <div class="sched-event">
+      <div class="sched-event-time">Afternoon</div>
+      <h3>Steppin' Out for Stonewall</h3>
+      <p>
+        Featuring <strong>Steppin' Out AVL</strong> on
+        <strong>Banks Ave</strong>. Close out the weekend
+        moving together.
+      </p>
+    </div>
+  </div>
+</div>
+```
+
+  </div>
+</section>
+
+<!-- ── ABOUT ── -->
+
+<section class="about" id="about">
+
+  <!-- dot-matrix canvas background -->
+
+<canvas id="dotMatrix"></canvas>
+
+  <div class="about-overlay"></div>
+
+  <div class="about-left">
+    <div class="sec-tag">Our Story</div>
+    <h2>
+      <span class="hi">History</span>
+      <span class="lo">Made</span>
+      Here.
+    </h2>
+    <div class="year-stamp">
+      <div class="ys-since">Since</div>
+      <div class="ys-year">1969</div>
+      <div class="ys-avl">◆ AVL 2026 ◆</div>
+    </div>
+  </div>
+
+  <div class="about-right">
+    <p>It started with a fight. On <strong>June 28, 1969</strong>, trans women of color and drag performers refused to be pushed out of the Stonewall Inn in New York City. Their resistance ignited the modern LGBTQIA2+ rights movement — and the world has honored that courage every June since.</p>
+    <p>Asheville is one of the South's most forward-thinking cities. But <strong>Asheville has never had a June Pride festival</strong> to match that history. That changes June 26–28, 2026.</p>
+    <div class="blockquote">
+      <p>Grounded in the courage of those who came before — loud, proud, and not going anywhere.</p>
+    </div>
+    <p>AVL Stonewall Fest is a three-day outdoor celebration bringing together performers, artists, vendors, food, and the full fabric of this community. No gatekeeping. No watered-down vibes. Just real, raw, joyful pride in the mountains.</p>
+    <a href="#join" class="btn btn-filled" style="margin-top:2.5rem; display:inline-block;">Get Involved →</a>
+  </div>
+</section>
+
+<!-- ── PARTICIPATE ── -->
+
+<section class="participate" id="join">
+  <div class="sec-tag">Participate</div>
+  <div class="part-head">
+    <h2>Show Up.<br><em>Get In.</em></h2>
+    <p>AVL Stonewall Fest is made by the community, for the community. Vendors, artists, food trucks, performers, nonprofits, and volunteers — you're what makes this real.</p>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-num">01</div>
+      <div class="card-accent" style="background:var(--rust)"></div>
+      <h3>Vendors &amp; Makers</h3>
+      <p class="card-body">Claim a 10×10 ft space and put your products in front of a crowd that genuinely wants to discover you.</p>
+      <div class="card-price">$125 / booth</div>
+    </div>
+    <div class="card">
+      <div class="card-num">02</div>
+      <div class="card-accent" style="background:var(--teal)"></div>
+      <h3>Food Trucks</h3>
+      <p class="card-body">Limited mobile kitchen spots available. Roll up and feed the people.</p>
+      <div class="card-price">$125 / spot</div>
+    </div>
+    <div class="card">
+      <div class="card-num">03</div>
+      <div class="card-accent" style="background:var(--olive)"></div>
+      <h3>Artists &amp; Nonprofits</h3>
+      <p class="card-body">A select number of free 10×10 spaces for Asheville-based artists and mission-driven orgs. Apply — spots go fast.</p>
+      <div class="card-price">Free · Apply</div>
+    </div>
+    <div class="card">
+      <div class="card-num">04</div>
+      <div class="card-accent" style="background:var(--mustard)"></div>
+      <h3>Performers &amp; Volunteers</h3>
+      <p class="card-body">Stage energy and volunteer power are the heartbeat of this festival. Step up and make it happen.</p>
+      <div class="card-price">Apply to Join</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SPONSORS ── -->
+
+<section class="sponsors" id="sponsors">
+  <div class="sec-tag">Sponsorship</div>
+  <h2>Show Up<br><span>Where It Matters.</span></h2>
+  <p class="sponsors-intro">Real visibility with a real community. Sponsoring AVL Stonewall Fest isn't just advertising — it's a statement about who you are and what you stand for.</p>
+
+  <div class="tiers">
+    <div class="tier">
+      <div class="tier-name">Visionary</div>
+      <div class="tier-amt">$5,000</div>
+      <p class="tier-desc">Headline recognition and premier placement across all channels, signage, and the main stage.</p>
+    </div>
+    <div class="tier">
+      <div class="tier-name">Champion</div>
+      <div class="tier-amt">$2,500</div>
+      <p class="tier-desc">Major stage presence and prominent brand coverage throughout the festival footprint.</p>
+    </div>
+    <div class="tier">
+      <div class="tier-name">Pillar</div>
+      <div class="tier-amt">$1,000</div>
+      <p class="tier-desc">Community recognition with on-site signage, digital features, and event materials.</p>
+    </div>
+    <div class="tier">
+      <div class="tier-name">Partner</div>
+      <div class="tier-amt">$500</div>
+      <p class="tier-desc">Sponsor recognition across event collateral and community platforms.</p>
+    </div>
+  </div>
+
+  <div class="circle-row">
+    <div>
+      <h3>Community Circle of Friends</h3>
+      <p>Individual donors are honored on our interactive Community Wall — a living tribute to the people who make this possible.</p>
+    </div>
+    <div class="circle-price">$100</div>
+    <a href="#donate" class="btn btn-filled">Join the Circle</a>
+  </div>
+</section>
+
+<!-- ── DONATE ── -->
+
+<section class="donate" id="donate">
+  <div class="sec-tag">Give</div>
+  <h2>Make Noise.<br><em>Make Impact.</em></h2>
+  <p>Every dollar funds the festival — the stage, the space, the people who show up. You're funding a moment that will outlast the night.</p>
+  <div class="amounts">
+    <button class="amt on">$10</button>
+    <button class="amt">$20</button>
+    <button class="amt">$30</button>
+    <button class="amt">$40</button>
+    <button class="amt">Custom</button>
+  </div>
+  <a href="#" class="btn-give">Donate Now</a>
+</section>
+
+<!-- ── FOOTER ── -->
+
+<div class="rainbow-bar"></div>
+<footer>
+  <div>
+    <div class="footer-logo">AVL Stonewall Fest</div>
+    <p class="footer-tagline">Asheville's June Pride celebration — rooted in history, built by community, open to everyone.</p>
+  </div>
+  <div class="footer-col">
+    <h4>Navigate</h4>
+    <ul>
+      <li><a href="#about">Our Story</a></li>
+      <li><a href="#join">Participate</a></li>
+      <li><a href="#sponsors">Sponsors</a></li>
+      <li><a href="#donate">Donate</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h4>Event Info</h4>
+    <ul>
+      <li><a href="#">June 26–28, 2026</a></li>
+      <li><a href="#">3-Day Event</a></li>
+      <li><a href="#">Asheville, NC</a></li>
+      <li><a href="#">Contact Us</a></li>
+    </ul>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 AVL Stonewall Fest · All rights reserved</p>
+    <p>Rooted in pride · Built by community · June 2026</p>
+  </div>
+</footer>
+
+<script>
+/* ── DOT MATRIX VINTAGE SLIDESHOW ── */
+(function () {
+
+  const canvas = document.getElementById('dotMatrix');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  const SCENES      = [drawStonewall, drawMarch, drawCrowd, drawBar, drawProtest, drawPortrait];
+  const DOT_SPACING = 5;    /* tighter grid = more detail */
+  const DOT_RADIUS  = 2.2;  /* slightly smaller dots so grid stays visible */
+  const FPS         = 24;
+  const HOLD_MS     = 4000;
+  const FADE_MS     = 1600;
+
+  let W = 1, H = 1;
+  let canvA, canvB, ctxA, ctxB, idA, idB;
+  let sceneIdx  = 0;
+  let startTime = null;
+  let phase     = 'hold'; // hold | fade
+  let raf;
+
+  /* ── Resize ── */
+  function resize() {
+    const section = canvas.closest('section') || canvas.parentElement;
+    W = section.offsetWidth  || window.innerWidth;
+    H = section.offsetHeight || Math.round(window.innerHeight * 1.2);
+    canvas.width  = W;
+    canvas.height = H;
+    buildOffscreen();
+    paintScene(ctxA, SCENES[sceneIdx], W, H);
+    paintScene(ctxB, SCENES[(sceneIdx + 1) % SCENES.length], W, H);
+    idA = ctxA.getImageData(0, 0, W, H);
+    idB = ctxB.getImageData(0, 0, W, H);
+  }
+
+  function buildOffscreen() {
+    canvA = document.createElement('canvas'); canvA.width = W; canvA.height = H;
+    canvB = document.createElement('canvas'); canvB.width = W; canvB.height = H;
+    ctxA  = canvA.getContext('2d');
+    ctxB  = canvB.getContext('2d');
+  }
+
+  /* ── Draw dot grid sampling two image datas blended by alpha ── */
+  function drawDots(a, b, t) {
+    ctx.fillStyle = '#0a0703';
+    ctx.fillRect(0, 0, W, H);
+    const cols = Math.ceil(W / DOT_SPACING);
+    const rows = Math.ceil(H / DOT_SPACING);
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const px = Math.round(c * DOT_SPACING + DOT_SPACING * 0.5);
+        const py = Math.round(r * DOT_SPACING + DOT_SPACING * 0.5);
+        const bA = brightness(a, px, py);
+        const bB = brightness(b, px, py);
+        /* power curve to crush shadows, blow out highlights */
+        const raw = bA * t + bB * (1 - t);
+        const bv  = Math.pow(raw, 0.65); /* gamma lift */
+        const rad = bv * DOT_RADIUS;
+        if (rad < 0.18) continue;
+        /* vivid sepia: dark=rust, mid=amber, bright=cream-white */
+        let rv, gv, bk;
+        if (bv < 0.35) {
+          /* shadows — deep rust */
+          const s = bv / 0.35;
+          rv = Math.round(80  + s * 120);
+          gv = Math.round(20  + s * 55);
+          bk = Math.round(5   + s * 10);
+        } else if (bv < 0.7) {
+          /* midtones — bright amber */
+          const s = (bv - 0.35) / 0.35;
+          rv = Math.round(200 + s * 45);
+          gv = Math.round(75  + s * 95);
+          bk = Math.round(15  + s * 20);
+        } else {
+          /* highlights — warm cream */
+          const s = (bv - 0.7) / 0.3;
+          rv = Math.min(255, Math.round(245 + s * 10));
+          gv = Math.min(255, Math.round(170 + s * 60));
+          bk = Math.min(255, Math.round(35  + s * 80));
+        }
+        ctx.fillStyle = `rgb(${rv},${gv},${bk})`;
+        ctx.beginPath();
+        ctx.arc(px, py, rad, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
+  function brightness(imgData, x, y) {
+    x = Math.min(W - 1, Math.max(0, x));
+    y = Math.min(H - 1, Math.max(0, y));
+    const i = (y * W + x) * 4;
+    const d = imgData.data;
+    return (d[i] * 0.299 + d[i+1] * 0.587 + d[i+2] * 0.114) / 255;
+  }
+
+  /* ── Animation loop ── */
+  function loop(ts) {
+    if (!startTime) startTime = ts;
+    const elapsed = ts - startTime;
+
+    if (phase === 'hold') {
+      drawDots(idA, idB, 1);
+      if (elapsed >= HOLD_MS) { phase = 'fade'; startTime = ts; }
+
+    } else {
+      const t = 1 - Math.min(elapsed / FADE_MS, 1);
+      drawDots(idA, idB, t);
+      if (t <= 0) {
+        /* swap A←B, paint new next into B */
+        [canvA, canvB] = [canvB, canvA];
+        [ctxA,  ctxB ] = [ctxB,  ctxA ];
+        idA = ctxA.getImageData(0, 0, W, H);
+        sceneIdx = (sceneIdx + 1) % SCENES.length;
+        const nextIdx = (sceneIdx + 1) % SCENES.length;
+        ctxB.clearRect(0, 0, W, H);
+        paintScene(ctxB, SCENES[nextIdx], W, H);
+        idB = ctxB.getImageData(0, 0, W, H);
+        phase = 'hold'; startTime = ts;
+      }
+    }
+    raf = requestAnimationFrame(loop);
+  }
+
+  /* ── Scene painter helper ── */
+  function paintScene(c, fn, w, h) {
+    c.fillStyle = '#0a0703';
+    c.fillRect(0, 0, w, h);
+    fn(c, w, h);
+  }
+
+  function sepia(lum) {
+    /* never fully black — lifts shadows to stay visible through dots */
+    const l = 0.12 + lum * 0.88;
+    const r = Math.min(255, Math.round(l * 255 * 1.20));
+    const g = Math.min(255, Math.round(l * 255 * 0.90));
+    const b = Math.min(255, Math.round(l * 255 * 0.55));
+    return `rgb(${r},${g},${b})`;
+  }
+
+  /* ═══ SCENE 1 — Stonewall Inn, night exterior ═══ */
+  function drawStonewall(c, w, h) {
+    /* night sky — blue-purple */
+    const sky=c.createLinearGradient(0,0,0,h*0.48);
+    sky.addColorStop(0,'#1a1f38'); sky.addColorStop(1,'#3c2c14');
+    c.fillStyle=sky; c.fillRect(0,0,w,h);
+    /* road */
+    const road=c.createLinearGradient(0,h*0.68,0,h);
+    road.addColorStop(0,'#3c3020'); road.addColorStop(1,'#201808');
+    c.fillStyle=road; c.fillRect(0,h*0.68,w,h);
+    /* building — warm stone */
+    c.fillStyle='#4a3c20'; c.fillRect(w*0.04,h*0.08,w*0.92,h*0.63);
+    /* bricks */
+    for(let row=0;row<28;row++){
+      const y=h*0.10+row*(h*0.020); const off=(row%2)*32;
+      for(let bx=-32+off;bx<w;bx+=64){
+        c.fillStyle=row%2===0?'#604a28':'#503c1e';
+        c.fillRect(bx+2,y+1,60,h*0.016);
+      }
+      c.fillStyle='#281c0a'; c.fillRect(0,y,w,1);
+    }
+    /* windows — lit warm gold */
+    [[0.08,0.13],[0.22,0.13],[0.36,0.13],[0.52,0.13],[0.66,0.13],[0.80,0.13],
+     [0.08,0.31],[0.22,0.31],[0.36,0.31],[0.52,0.31],[0.66,0.31],[0.80,0.31]].forEach(([fx,fy])=>{
+      const wg=c.createRadialGradient(w*fx+w*0.055,h*fy+h*0.04,0,w*fx+w*0.055,h*fy+h*0.04,w*0.09);
+      wg.addColorStop(0,'rgba(240,160,40,0.55)'); wg.addColorStop(1,'transparent');
+      c.fillStyle=wg; c.fillRect(w*fx-w*0.02,h*fy-h*0.015,w*0.16,h*0.12);
+      c.fillStyle='#201408'; c.fillRect(w*fx,h*fy,w*0.11,h*0.085);
+      c.fillStyle='#e09828'; c.fillRect(w*fx+2,h*fy+2,w*0.11-4,h*0.085-4);
+      c.fillStyle='#201408';
+      c.fillRect(w*fx+w*0.055-1,h*fy,2,h*0.085);
+      c.fillRect(w*fx,h*fy+h*0.042-1,w*0.11,2);
+    });
+    /* awning — red/white stripes */
+    for(let s=0;s<12;s++){
+      c.fillStyle=s%2===0?'#a01010':'#f0ece0';
+      const x1=w*0.05+s*(w*0.9/12);
+      c.beginPath();
+      c.moveTo(x1,h*0.55); c.lineTo(x1+w*0.9/12,h*0.55);
+      c.lineTo(x1+w*0.9/12-w*0.015,h*0.64); c.lineTo(x1-w*0.005,h*0.64);
+      c.closePath(); c.fill();
+    }
+    /* sign — bright yellow */
+    c.fillStyle='#f0e040'; c.fillRect(w*0.24,h*0.535,w*0.52,h*0.052);
+    c.fillStyle='#181008';
+    c.font=`bold ${Math.round(h*0.036)}px serif`;
+    c.textAlign='center'; c.textBaseline='middle';
+    c.fillText('STONEWALL INN',w*0.5,h*0.561);
+    /* streetlamps + glow */
+    [0.12,0.5,0.88].forEach(lx=>{
+      const lg=c.createRadialGradient(w*lx,h*0.5,0,w*lx,h*0.5,w*0.2);
+      lg.addColorStop(0,'rgba(255,200,80,0.6)'); lg.addColorStop(1,'transparent');
+      c.fillStyle=lg; c.fillRect(0,0,w,h);
+      c.fillStyle='#302010'; c.fillRect(w*lx-3,h*0.42,6,h*0.15);
+      c.fillStyle='#fff5a0'; c.beginPath(); c.arc(w*lx,h*0.42,9,0,Math.PI*2); c.fill();
+    });
+    /* crowd silhouettes */
+    for(let i=0;i<24;i++){
+      const px=w*(0.02+i*0.041), py=h*(0.71+Math.sin(i*0.9)*0.012);
+      const hh=h*(0.026+Math.random()*0.012);
+      c.fillStyle='#181208';
+      c.beginPath(); c.ellipse(px,py-hh,hh*0.62,hh*0.62,0,0,Math.PI*2); c.fill();
+      c.fillRect(px-hh*0.42,py-hh*0.08,hh*0.84,hh*2.3);
+      if(i%4===0){ /* raised fist */
+        c.strokeStyle='#181208'; c.lineWidth=2;
+        c.beginPath(); c.moveTo(px,py+hh*0.5); c.lineTo(px-hh*0.9,py-hh*0.5); c.stroke();
+        c.beginPath(); c.ellipse(px-hh*0.9,py-hh*0.7,hh*0.32,hh*0.32,0,0,Math.PI*2); c.fill();
+      }
+    }
+  }
+
+  /* ═══ SCENE 2 — Protest march, bright daytime ═══ */
+  function drawMarch(c, w, h) {
+    const sky=c.createLinearGradient(0,0,0,h*0.38);
+    sky.addColorStop(0,'#7090c0'); sky.addColorStop(1,'#c8b880');
+    c.fillStyle=sky; c.fillRect(0,0,w,h);
+    /* asphalt */
+    c.fillStyle='#685848'; c.fillRect(0,h*0.38,w,h);
+    for(let i=0;i<9;i++){ c.fillStyle='#786858'; c.fillRect(0,h*(0.38+i*0.07),w,h*0.005); }
+    /* centre lane line */
+    c.fillStyle='#f0e060';
+    for(let i=0;i<8;i++) c.fillRect(w*0.49,h*(0.38+i*0.08),w*0.02,h*0.04);
+    /* bg buildings */
+    [[0.0,0.26,0.16,'#504030'],[0.16,0.32,0.22,'#403828'],[0.38,0.22,0.2,'#4a3c28'],
+     [0.60,0.34,0.18,'#382e1c'],[0.80,0.28,0.2,'#483a24']].forEach(([x,ht,wd,col])=>{
+      c.fillStyle=col; c.fillRect(w*x,h*(0.38-ht),w*wd,h*ht);
+      for(let wr=0;wr<Math.round(ht*10);wr++)
+        for(let wc=0;wc<3;wc++){
+          c.fillStyle=Math.random()>0.45?'#d8a838':'#2a1e0e';
+          c.fillRect(w*x+w*wd*0.12+wc*w*wd*0.27,h*(0.40-ht)+wr*h*0.034,w*wd*0.17,h*0.024);
+        }
+    });
+    /* vivid banners */
+    const bdata=[['EQUALITY','#c01010','#f8f0b0'],['PRIDE','#1040c0','#f8f020'],
+                 ['STONEWALL','#f8e010','#181008'],['RESIST','#18a028','#f0f0f0'],
+                 ['UNITY','#901090','#f8f8f8'],['LOVE IS LOVE','#c01010','#f8f0b0']];
+    bdata.forEach((b,i)=>{
+      const bx=w*(0.01+i*0.163), by=h*(0.03+Math.sin(i*1.2)*0.055);
+      c.save(); c.translate(bx+w*0.075,by+h*0.058);
+      c.rotate((i%2===0?1:-1)*0.05);
+      c.fillStyle=b[1]; c.fillRect(-w*0.075,-h*0.058,w*0.15,h*0.116);
+      /* border */
+      c.strokeStyle=b[2]; c.lineWidth=2; c.strokeRect(-w*0.075,-h*0.058,w*0.15,h*0.116);
+      c.fillStyle=b[2]; c.font=`900 ${Math.round(h*0.034)}px sans-serif`;
+      c.textAlign='center'; c.textBaseline='middle'; c.fillText(b[0],0,0);
+      c.restore();
+      c.strokeStyle='#503820'; c.lineWidth=3;
+      c.beginPath(); c.moveTo(bx+w*0.075,by+h*0.116); c.lineTo(bx+w*0.075,h*0.80); c.stroke();
+    });
+    /* crowd rows */
+    for(let row=0;row<12;row++)
+      for(let col=0;col<28;col++){
+        const px=w*(0.01+col*0.036)+Math.sin(row*0.7+col)*4;
+        const py=h*(0.40+row*0.048);
+        const sz=h*(0.019+Math.random()*0.009);
+        const lum=0.32+row*0.035+Math.random()*0.22;
+        c.fillStyle=sepia(lum);
+        c.beginPath(); c.ellipse(px,py-sz,sz*0.68,sz*0.68,0,0,Math.PI*2); c.fill();
+        c.fillStyle=sepia(lum*0.68); c.fillRect(px-sz*0.44,py-sz*0.08,sz*0.88,sz*1.65);
+        if(Math.random()>0.52){ c.fillStyle=sepia(lum*0.45); c.fillRect(px-sz*0.68,py-sz*1.05,sz*1.36,sz*0.48); }
+      }
+  }
+
+  /* ═══ SCENE 3 — Greenwich Village, dusk streets ═══ */
+  function drawCrowd(c, w, h) {
+    const sky=c.createLinearGradient(0,0,0,h*0.5);
+    sky.addColorStop(0,'#3a2850'); sky.addColorStop(0.4,'#c05518'); sky.addColorStop(1,'#e89530');
+    c.fillStyle=sky; c.fillRect(0,0,w,h);
+    c.fillStyle='#504030'; c.fillRect(0,h*0.58,w,h);
+    /* building silhouettes */
+    [[0,0.55,0.15,'#1c1410'],[0.15,0.48,0.13,'#201810'],[0.28,0.62,0.21,'#181210'],
+     [0.49,0.50,0.15,'#1c1610'],[0.64,0.57,0.17,'#201810'],[0.81,0.44,0.19,'#181410']].forEach(([x,ht,wd,col])=>{
+      c.fillStyle=col; c.fillRect(w*x,h*(1-ht),w*wd,h*ht);
+      for(let wr=0;wr<Math.round(ht*12);wr++)
+        for(let wc=0;wc<Math.round(wd*9);wc++)
+          if(Math.random()>0.48){
+            c.fillStyle=Math.random()>0.3?'#e0a028':'#c07820';
+            c.fillRect(w*x+w*wd*0.08+wc*w*wd*0.19,h*(1-ht)+h*0.02+wr*h*0.042,w*wd*0.13,h*0.028);
+          }
+    });
+    /* crowd in street */
+    for(let i=0;i<180;i++){
+      const px=Math.random()*w, py=h*0.59+Math.random()*h*0.38;
+      const sz=h*0.022+Math.random()*h*0.024; const lum=0.28+Math.random()*0.58;
+      c.fillStyle=sepia(lum); c.beginPath(); c.ellipse(px,py-sz,sz*0.64,sz*0.64,0,0,Math.PI*2); c.fill();
+      c.fillStyle=sepia(lum*0.64); c.fillRect(px-sz*0.48,py-sz*0.05,sz*0.96,sz*1.75);
+    }
+    /* streetlamp glows */
+    [0.12,0.38,0.64,0.88].forEach(lx=>{
+      const lg=c.createRadialGradient(w*lx,h*0.48,0,w*lx,h*0.48,w*0.15);
+      lg.addColorStop(0,'rgba(255,180,50,0.65)'); lg.addColorStop(1,'transparent');
+      c.fillStyle=lg; c.fillRect(0,0,w,h);
+      c.fillStyle='#281808'; c.fillRect(w*lx-3,h*0.42,6,h*0.18);
+      c.fillStyle='#fff8b0'; c.beginPath(); c.arc(w*lx,h*0.42,8,0,Math.PI*2); c.fill();
+    });
+  }
+
+  /* ═══ SCENE 4 — Bar interior ═══ */
+  function drawBar(c, w, h) {
+    /* ceiling with wood beams */
+    const ceil=c.createLinearGradient(0,0,0,h*0.3);
+    ceil.addColorStop(0,'#2e2010'); ceil.addColorStop(1,'#3e2e16');
+    c.fillStyle=ceil; c.fillRect(0,0,w,h*0.3);
+    for(let i=0;i<7;i++){ c.fillStyle='#1e1408'; c.fillRect(w*(0.05+i*0.14)-w*0.024,0,w*0.048,h*0.28); }
+    /* wall — warm brick */
+    c.fillStyle='#503820'; c.fillRect(0,h*0.28,w,h*0.38);
+    for(let row=0;row<9;row++){
+      const y=h*0.29+row*h*0.038; const off=(row%2)*36;
+      for(let bx=-36+off;bx<w;bx+=72){
+        c.fillStyle=row%2===0?'#644228':'#503820';
+        c.fillRect(bx+2,y+1,68,h*0.032);
+      }
+    }
+    /* mirror — bright silvery */
+    c.fillStyle='#b0c8d0'; c.fillRect(w*0.05,h*0.30,w*0.9,h*0.25);
+    const ms=c.createLinearGradient(0,h*0.3,w*0.5,h*0.55);
+    ms.addColorStop(0,'rgba(255,255,255,0.35)'); ms.addColorStop(1,'rgba(180,220,255,0.15)');
+    c.fillStyle=ms; c.fillRect(w*0.05,h*0.30,w*0.9,h*0.25);
+    /* mirror frame */
+    c.strokeStyle='#a08030'; c.lineWidth=6; c.strokeRect(w*0.05,h*0.30,w*0.9,h*0.25);
+    /* shelf */
+    c.fillStyle='#906a28'; c.fillRect(0,h*0.52,w,h*0.018);
+    /* bottles — vivid colors */
+    const bcols=['#c02810','#1a7030','#1a3898','#9a6808','#681890','#106898'];
+    for(let i=0;i<22;i++){
+      const bx=w*(0.025+i*0.044), bh=h*(0.09+Math.random()*0.10);
+      c.fillStyle=bcols[i%bcols.length]; c.fillRect(bx,h*0.52-bh,w*0.034,bh);
+      /* label */
+      c.fillStyle='rgba(255,240,200,0.85)'; c.fillRect(bx+2,h*0.52-bh*0.58,w*0.034-4,bh*0.28);
+    }
+    /* bar counter */
+    c.fillStyle='#2a1a0a'; c.fillRect(0,h*0.65,w,h*0.15);
+    c.fillStyle='#c89018'; c.fillRect(0,h*0.65,w,h*0.016);
+    /* floor */
+    c.fillStyle='#382c14'; c.fillRect(0,h*0.80,w,h);
+    for(let i=0;i<10;i++){ c.fillStyle=i%2===0?'#403214':'#2e2410'; c.fillRect(w*i*0.1,h*0.80,w*0.1,h); }
+    /* stools */
+    for(let i=0;i<9;i++){
+      const sx=w*(0.04+i*0.107);
+      c.fillStyle='#882810'; c.beginPath(); c.ellipse(sx,h*0.65,w*0.038,h*0.018,0,0,Math.PI*2); c.fill();
+      c.strokeStyle='#c09020'; c.lineWidth=3;
+      c.beginPath(); c.moveTo(sx-w*0.02,h*0.668); c.lineTo(sx-w*0.024,h*0.80); c.stroke();
+      c.beginPath(); c.moveTo(sx+w*0.02,h*0.668); c.lineTo(sx+w*0.024,h*0.80); c.stroke();
+      c.beginPath(); c.moveTo(sx-w*0.022,h*0.73); c.lineTo(sx+w*0.022,h*0.73); c.stroke();
+    }
+    /* patrons */
+    for(let i=0;i<8;i++){
+      const px=w*(0.055+i*0.125); const lum=0.38+Math.random()*0.35;
+      c.fillStyle=sepia(lum); c.beginPath(); c.ellipse(px,h*0.59,h*0.03,h*0.03,0,0,Math.PI*2); c.fill();
+      c.fillStyle=sepia(lum*0.72); c.fillRect(px-h*0.024,h*0.59,h*0.048,h*0.07);
+      c.strokeStyle=sepia(0.7); c.lineWidth=3;
+      c.beginPath(); c.moveTo(px+h*0.02,h*0.61); c.lineTo(px+h*0.065,h*0.645); c.stroke();
+      c.fillStyle='rgba(220,190,90,0.85)'; c.fillRect(px+h*0.06,h*0.642,h*0.02,h*0.024);
+    }
+    /* warm ceiling light halos */
+    for(let i=0;i<7;i++){
+      const lx=w*(0.06+i*0.145);
+      const lg=c.createRadialGradient(lx,h*0.2,0,lx,h*0.2,w*0.16);
+      lg.addColorStop(0,'rgba(255,170,50,0.55)'); lg.addColorStop(1,'transparent');
+      c.fillStyle=lg; c.fillRect(0,0,w,h*0.5);
+      c.fillStyle='#ffe070'; c.beginPath(); c.arc(lx,h*0.2,6,0,Math.PI*2); c.fill();
+    }
+  }
+
+  /* ═══ SCENE 5 — Newspaper front page ═══ */
+  function drawProtest(c, w, h) {
+    /* aged newsprint */
+    c.fillStyle='#d8bc7a'; c.fillRect(0,0,w,h);
+    for(let i=0;i<44;i++){
+      c.fillStyle=`rgba(${190+i},${148+i},${60+i*0.4},${0.1+i*0.004})`;
+      c.fillRect(0,h*0.023*i,w,h*0.020);
+    }
+    /* masthead */
+    c.fillStyle='#0e0a04'; c.fillRect(w*0.02,h*0.03,w*0.96,h*0.11);
+    c.fillStyle='#f0d830';
+    c.font=`900 ${Math.round(h*0.072)}px serif`;
+    c.textAlign='center'; c.textBaseline='middle';
+    c.fillText('THE VILLAGE VOICE',w*0.5,h*0.085);
+    /* date bar */
+    c.fillStyle='#0e0a04'; c.fillRect(w*0.02,h*0.145,w*0.96,h*0.022);
+    c.fillStyle='#ecdda0';
+    c.font=`${Math.round(h*0.013)}px serif`;
+    c.fillText('NEW YORK · SATURDAY, JUNE 28, 1969 · PRICE: 25¢',w*0.5,h*0.156);
+    /* headline block */
+    c.fillStyle='#0e0a04'; c.fillRect(w*0.02,h*0.175,w*0.96,h*0.17);
+    c.fillStyle='#e81010';
+    c.font=`900 ${Math.round(h*0.105)}px sans-serif`;
+    c.textAlign='center'; c.textBaseline='middle';
+    c.fillText('STONEWALL',w*0.5,h*0.237);
+    c.fillStyle='#f0e830';
+    c.font=`bold ${Math.round(h*0.034)}px serif`;
+    c.fillText('RIOTS ERUPT IN GREENWICH VILLAGE',w*0.5,h*0.316);
+    /* subhead */
+    c.fillStyle='#1e1408';
+    c.font=`italic ${Math.round(h*0.022)}px serif`;
+    c.fillText('Police Clash With Hundreds Outside Christopher Street Bar',w*0.5,h*0.360);
+    /* rule */
+    c.strokeStyle='#0e0a04'; c.lineWidth=2;
+    c.beginPath(); c.moveTo(w*0.02,h*0.378); c.lineTo(w*0.98,h*0.378); c.stroke();
+    /* photo box */
+    c.fillStyle='#b09860'; c.fillRect(w*0.03,h*0.388,w*0.4,h*0.33);
+    c.strokeStyle='#0e0a04'; c.lineWidth=1; c.strokeRect(w*0.03,h*0.388,w*0.4,h*0.33);
+    for(let i=0;i<35;i++){
+      const px=w*0.03+Math.random()*w*0.4, py=h*0.388+Math.random()*h*0.33;
+      const sz=h*0.022+Math.random()*h*0.022;
+      c.fillStyle=sepia(0.22+Math.random()*0.52);
+      c.beginPath(); c.ellipse(px,py,sz*0.62,sz*0.62,0,0,Math.PI*2); c.fill();
+      c.fillStyle=sepia(0.18+Math.random()*0.35); c.fillRect(px-sz*0.42,py+sz*0.5,sz*0.84,sz*1.5);
+    }
+    c.fillStyle='#0e0a04'; c.font=`italic ${Math.round(h*0.015)}px serif`; c.textAlign='left';
+    c.fillText('Scene outside the Stonewall Inn · June 28, 1969',w*0.035,h*0.728);
+    /* text column */
+    c.textAlign='left'; c.fillStyle='#1a1008'; c.font=`${Math.round(h*0.019)}px serif`;
+    ['Hundreds of protesters clashed with','police outside the Stonewall Inn in',
+     'Greenwich Village late Friday night','in what witnesses called the most',
+     'significant act of resistance the','gay community has ever staged in the',
+     'history of New York City.','',
+     'The uprising began when officers','moved to arrest bar patrons, prompt-',
+     'ing crowds to fight back. The scene','spread across Christopher Street.'].forEach((line,i)=>{
+      c.fillText(line,w*0.46,h*(0.398+i*h*0.000050*h));
+    });
+    c.strokeStyle='#0e0a04'; c.lineWidth=1;
+    c.beginPath(); c.moveTo(w*0.44,h*0.378); c.lineTo(w*0.44,h*0.755); c.stroke();
+    c.beginPath(); c.moveTo(w*0.02,h*0.755); c.lineTo(w*0.98,h*0.755); c.stroke();
+  }
+
+  /* ═══ SCENE 6 — Close portrait, candlelight ═══ */
+  function drawPortrait(c, w, h) {
+    c.fillStyle='#120d06'; c.fillRect(0,0,w,h);
+    /* warm ambient */
+    const amb=c.createRadialGradient(w*0.5,h*0.42,0,w*0.5,h*0.42,w*0.7);
+    amb.addColorStop(0,'rgba(140,80,20,0.6)'); amb.addColorStop(1,'transparent');
+    c.fillStyle=amb; c.fillRect(0,0,w,h);
+    /* bg figures */
+    for(let i=0;i<45;i++){
+      const px=Math.random()*w, py=Math.random()*h;
+      c.fillStyle=sepia(0.12+Math.random()*0.22);
+      c.beginPath(); c.ellipse(px,py,h*0.06,h*0.06,0,0,Math.PI*2); c.fill();
+    }
+    const fx=w*0.5, fy=h*0.40, fr=h*0.27;
+    /* shoulders */
+    const sg=c.createLinearGradient(fx-fr*1.4,fy+fr,fx+fr*1.4,fy+fr);
+    sg.addColorStop(0,sepia(0.08)); sg.addColorStop(0.5,sepia(0.40)); sg.addColorStop(1,sepia(0.08));
+    c.fillStyle=sg; c.fillRect(fx-fr*1.4,fy+fr*0.9,fr*2.8,fr*0.95);
+    c.fillStyle=sepia(0.45); c.fillRect(fx-fr*0.28,fy+fr*0.84,fr*0.56,fr*0.52);
+    /* face — side lit */
+    const fg2=c.createRadialGradient(fx-fr*0.18,fy-fr*0.08,0,fx,fy,fr*1.08);
+    fg2.addColorStop(0,sepia(0.80)); fg2.addColorStop(0.35,sepia(0.62));
+    fg2.addColorStop(0.72,sepia(0.32)); fg2.addColorStop(1,sepia(0.10));
+    c.fillStyle=fg2;
+    c.beginPath(); c.ellipse(fx,fy,fr*0.74,fr,0,0,Math.PI*2); c.fill();
+    /* bright cheek highlight */
+    const hl=c.createRadialGradient(fx-fr*0.22,fy-fr*0.04,0,fx-fr*0.22,fy-fr*0.04,fr*0.42);
+    hl.addColorStop(0,'rgba(255,215,130,0.62)'); hl.addColorStop(1,'transparent');
+    c.fillStyle=hl; c.beginPath(); c.ellipse(fx,fy,fr*0.74,fr,0,0,Math.PI*2); c.fill();
+    /* eyes */
+    [-1,1].forEach(s=>{
+      const ex=fx+s*fr*0.27, ey=fy-fr*0.13;
+      c.fillStyle='rgba(10,6,2,0.65)'; c.beginPath(); c.ellipse(ex,ey,fr*0.19,fr*0.13,0,0,Math.PI*2); c.fill();
+      c.fillStyle=sepia(0.62); c.beginPath(); c.ellipse(ex,ey,fr*0.10,fr*0.11,0,0,Math.PI*2); c.fill();
+      c.fillStyle='#060402'; c.beginPath(); c.ellipse(ex,ey,fr*0.052,fr*0.056,0,0,Math.PI*2); c.fill();
+      /* catchlight */
+      c.fillStyle='rgba(255,235,160,0.95)'; c.beginPath(); c.ellipse(ex-fr*0.026,ey-fr*0.03,fr*0.02,fr*0.02,0,0,Math.PI*2); c.fill();
+      /* brow */
+      c.strokeStyle=sepia(0.28); c.lineWidth=fr*0.038;
+      c.beginPath(); c.arc(ex,ey-fr*0.15,fr*0.16,-Math.PI*0.78,-Math.PI*0.22); c.stroke();
+    });
+    /* nose */
+    c.strokeStyle=sepia(0.22); c.lineWidth=fr*0.032;
+    c.beginPath(); c.moveTo(fx,fy-fr*0.08); c.lineTo(fx-fr*0.08,fy+fr*0.26); c.stroke();
+    c.beginPath(); c.arc(fx-fr*0.12,fy+fr*0.28,fr*0.07,0,Math.PI); c.stroke();
+    c.beginPath(); c.arc(fx+fr*0.04,fy+fr*0.28,fr*0.07,0,Math.PI); c.stroke();
+    /* mouth */
+    c.strokeStyle=sepia(0.20); c.lineWidth=fr*0.042;
+    c.beginPath(); c.arc(fx,fy+fr*0.48,fr*0.20,0.16,Math.PI-0.16); c.stroke();
+    c.beginPath(); c.moveTo(fx-fr*0.20,fy+fr*0.48); c.lineTo(fx+fr*0.20,fy+fr*0.48); c.stroke();
+    /* hair */
+    c.fillStyle=sepia(0.20);
+    c.beginPath(); c.ellipse(fx,fy-fr*0.84,fr*0.76,fr*0.46,0,Math.PI,0); c.fill();
+    c.beginPath(); c.ellipse(fx-fr*0.73,fy+fr*0.12,fr*0.23,fr*0.56,0.28,0,Math.PI*2); c.fill();
+    c.beginPath(); c.ellipse(fx+fr*0.73,fy+fr*0.12,fr*0.23,fr*0.56,-0.28,0,Math.PI*2); c.fill();
+    /* rim glow */
+    const rim=c.createRadialGradient(fx,fy,fr*0.62,fx,fy,fr*1.35);
+    rim.addColorStop(0,'transparent'); rim.addColorStop(0.7,'rgba(190,85,12,0.28)'); rim.addColorStop(1,'transparent');
+    c.fillStyle=rim; c.beginPath(); c.ellipse(fx,fy,fr*0.74,fr,0,0,Math.PI*2); c.fill();
+    /* vignette */
+    const vig=c.createRadialGradient(fx,fy,fr*0.58,fx,fy,fr*3.4);
+    vig.addColorStop(0,'transparent'); vig.addColorStop(0.62,'rgba(8,5,2,0.65)'); vig.addColorStop(1,'rgba(4,2,1,0.98)');
+    c.fillStyle=vig; c.fillRect(0,0,w,h);
+  }
+    /* road */
+    c.fillStyle = '#0e0a05'; c.fillRect(0, h * 0.7, w, h);
+    /* building face */
+    c.fillStyle = '#1a1208'; c.fillRect(w*0.04, h*0.1, w*0.92, h*0.62);
+    /* bricks */
+    for (let row = 0; row < 24; row++) {
+      const y   = h*0.12 + row*(h*0.024);
+      const off = (row%2)*30;
+      for (let bx = -30+off; bx < w; bx += 60) {
+        c.fillStyle = row%3===0 ? '#281c09' : '#201508';
+        c.fillRect(bx+2, y+1, 56, h*0.02);
+      }
+    }
+    /* windows */
+    [[0.1,0.16],[0.28,0.16],[0.46,0.16],[0.64,0.16],[0.82,0.16],
+     [0.1,0.36],[0.28,0.36],[0.46,0.36],[0.64,0.36],[0.82,0.36]].forEach(([fx,fy])=>{
+      c.fillStyle='#3a2c0c'; c.fillRect(w*fx,h*fy,w*0.13,h*0.09);
+      c.fillStyle='#4e3c10'; c.fillRect(w*fx+3,h*fy+3,w*0.13-6,h*0.09-6);
+    });
+    /* awning */
+    c.fillStyle='#2e2008';
+    c.beginPath(); c.moveTo(w*0.06,h*0.57); c.lineTo(w*0.94,h*0.57);
+    c.lineTo(w*0.9,h*0.66); c.lineTo(w*0.1,h*0.66); c.closePath(); c.fill();
+    for(let s=0;s<9;s++){
+      c.fillStyle = s%2===0?'#3e2e0c':'#251a07';
+      const x1=w*0.06+s*(w*0.88/9);
+      c.beginPath(); c.moveTo(x1,h*0.57); c.lineTo(x1+w*0.88/9,h*0.57);
+      c.lineTo(x1+w*0.88/9-w*0.025,h*0.66); c.lineTo(x1,h*0.66); c.closePath(); c.fill();
+    }
+    /* sign */
+    c.fillStyle='#50400f'; c.fillRect(w*0.28,h*0.54,w*0.44,h*0.055);
+    c.fillStyle='#c8a030'; c.font=`bold ${Math.round(h*0.036)}px serif`;
+    c.textAlign='center'; c.textBaseline='middle';
+    c.fillText('STONEWALL INN', w*0.5, h*0.568);
+    /* street crowd silhouettes */
+    for(let i=0;i<20;i++){
+      const px=w*(0.03+i*0.048), py=h*0.72;
+      const hd=h*(0.016+Math.random()*0.008);
+      c.fillStyle='#0c0906';
+      c.beginPath(); c.ellipse(px,py-hd,hd*0.7,hd*0.7,0,0,Math.PI*2); c.fill();
+      c.fillRect(px-hd*0.4,py-hd*0.1,hd*0.8,h*0.06);
+    }
+  }
+  /* ── Boot ── */
+  function start() {
+    resize();
+    raf = requestAnimationFrame(loop);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start);
+  } else {
+    setTimeout(start, 50);
+  }
+
+  window.addEventListener('resize', () => {
+    cancelAnimationFrame(raf);
+    resize();
+    raf = requestAnimationFrame(loop);
+  });
+
+})();
+</script>
+
+<script>
+  document.querySelectorAll('.amt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.amt').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+    });
+  });
+</script>
+
+<script>
+/* ── STONEWALL: clean draw + 3 crisp echoes + letter sparks ── */
+(function(){
+  const sw = document.querySelector('.ht-sw');
+  if (!sw) return;
+
+  /* Set plain text back — no spans yet, let CSS draw-in run first */
+  sw.textContent = 'STONEWALL';
+  sw.style.color = 'transparent';
+  sw.style.webkitTextStroke = '3px #d4870a';
+
+  /* After draw + flicker finish, add third echo span + trigger CSS echoes */
+  setTimeout(() => {
+    /* CSS echoes (::before rust, ::after teal) */
+    sw.classList.add('echoes-on');
+
+    /* 3rd echo — purple, further behind, done via injected span */
+    const e3 = document.createElement('span');
+    e3.textContent = 'STONEWALL';
+    e3.style.cssText = `
+      position:absolute; left:15px; top:15px; display:block;
+      white-space:nowrap; color:transparent;
+      -webkit-text-stroke:1.5px #6b2d8b;
+      font-family:inherit; font-size:inherit; letter-spacing:inherit;
+      z-index:-3; pointer-events:none;
+      opacity:0; transition:opacity 0.3s ease;
+    `;
+    sw.style.position = 'relative';
+    sw.appendChild(e3);
+    setTimeout(() => { e3.style.opacity = '0.6'; }, 50);
+
+    /* Now swap text content to letter spans for individual spark */
+    const letters = 'STONEWALL'.split('');
+    const frag = document.createDocumentFragment();
+    letters.forEach((ch, i) => {
+      const s = document.createElement('span');
+      s.textContent = ch;
+      s.style.cssText = `
+        display:inline-block;
+        animation: lSpark 0.5s ${i * 0.07}s ease both;
+      `;
+      frag.appendChild(s);
+    });
+
+    /* Keep echo span, clear text, add letter spans */
+    sw.innerHTML = '';
+    sw.appendChild(frag);
+    sw.appendChild(e3);
+
+    /* Re-add echoes class after innerHTML wipe */
+    sw.classList.add('echoes-on');
+
+    /* Inject spark keyframe */
+    if (!document.getElementById('sparkKF')) {
+      const st = document.createElement('style');
+      st.id = 'sparkKF';
+      st.textContent = `
+        @keyframes lSpark {
+          0%   { opacity:0; transform:translateY(8px) skewX(-5deg); }
+          40%  { opacity:1; transform:translateY(-4px) skewX(2deg);
+                 filter:drop-shadow(0 0 14px rgba(212,135,10,0.95)); }
+          70%  { transform:translateY(1px); filter:drop-shadow(0 0 5px rgba(212,135,10,0.4)); }
+          100% { opacity:1; transform:none; filter:none; }
+        }
+      `;
+      document.head.appendChild(st);
+    }
+
+    /* Ongoing random letter shimmer */
+    setTimeout(() => {
+      const els = sw.querySelectorAll('span[style*="lSpark"]');
+      if (!els.length) return;
+      setInterval(() => {
+        const el = els[Math.floor(Math.random() * els.length)];
+        el.style.transition = 'filter 0.08s, -webkit-text-stroke 0.08s';
+        el.style.filter = 'drop-shadow(0 0 16px rgba(212,135,10,1))';
+        el.style.webkitTextStroke = '3px #f5c830';
+        setTimeout(() => {
+          el.style.filter = '';
+          el.style.webkitTextStroke = '';
+        }, 130 + Math.random() * 170);
+      }, 380);
+    }, 1500);
+
+  }, 2000); /* start after draw (0.6s) + flicker + settle */
+})();
+
+/* ── STAMP: spin in, count 1969 → 2026 ── */
+(function(){
+  const yr  = document.getElementById('stampYear');
+  const sub = document.getElementById('stampSub');
+  if (!yr) return;
+
+  /* Count up after spin lands (~3.3s total) */
+  setTimeout(() => {
+    let n = 1969;
+    const timer = setInterval(() => {
+      n += 3;
+      if (n >= 2026) {
+        n = 2026;
+        clearInterval(timer);
+        /* Land on amber */
+        yr.style.transition = 'color 0.35s';
+        yr.style.color = '#d4870a';
+        if (sub) {
+          sub.style.transition = 'opacity 0.3s';
+          sub.style.opacity = '0';
+          setTimeout(() => {
+            sub.textContent = '◆ AVL · June 2026 ◆';
+            sub.style.color = '#d4870a';
+            sub.style.opacity = '1';
+          }, 350);
+        }
+      }
+      yr.textContent = n;
+    }, 40);
+  }, 3300);
+})();
+
+/* ── Halftone breath ── */
+(function(){
+  const hb = document.querySelector('.hero-halftone');
+  if (!hb) return;
+  const s = document.createElement('style');
+  s.textContent = `
+    @keyframes halftoneBreath {
+      0%,100% { opacity:.06; background-size:28px 28px; }
+      50%      { opacity:.13; background-size:23px 23px; }
+    }
+  `;
+  document.head.appendChild(s);
+  hb.style.animation = 'halftoneBreath 4s ease-in-out infinite';
+})();
+</script>
+
+</body>
+</html>
