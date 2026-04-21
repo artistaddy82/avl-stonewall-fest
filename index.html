@@ -82,17 +82,32 @@ HERO
 ───────────────────────────────────────── */
 .hero {
 min-height: 100vh;
-background: var(–ink);
+background: var(--ink);
+background-image: url('hero-bg.jpg');
+background-size: cover;
+background-position: center 30%;
+background-repeat: no-repeat;
 display: grid;
 grid-template-rows: 1fr auto;
 padding-top: 56px;
 position: relative; overflow: hidden;
 }
+/* dark overlay so text stays readable */
+.hero::before {
+content: '';
+position: absolute; inset: 0; z-index: 0;
+background: linear-gradient(
+  160deg,
+  rgba(19,14,5,0.82) 0%,
+  rgba(19,14,5,0.65) 50%,
+  rgba(19,14,5,0.78) 100%
+);
+}
 
 /* halftone dot bg */
 .hero-halftone {
-position: absolute; inset: 0; pointer-events: none; opacity: 0.07;
-background-image: radial-gradient(circle, var(–amber) 1px, transparent 1px);
+position: absolute; inset: 0; pointer-events: none; opacity: 0.07; z-index: 1;
+background-image: radial-gradient(circle, var(--amber) 1px, transparent 1px);
 background-size: 28px 28px;
 }
 
@@ -1174,14 +1189,46 @@ to   { opacity: 1; transform: translateY(0); }
   <h2>Make Noise.<br><em>Make Impact.</em></h2>
   <p>Every dollar funds the festival — the stage, the space, the people who show up. You're funding a moment that will outlast the night.</p>
   <div class="amounts">
-    <button class="amt on">$10</button>
-    <button class="amt">$20</button>
-    <button class="amt">$30</button>
-    <button class="amt">$40</button>
-    <button class="amt">Custom</button>
+    <button class="amt on" data-amount="10">$10</button>
+    <button class="amt" data-amount="20">$20</button>
+    <button class="amt" data-amount="30">$30</button>
+    <button class="amt" data-amount="40">$40</button>
+    <button class="amt" data-amount="custom">Custom</button>
   </div>
-  <a href="#" class="btn-give">Donate Now</a>
+  <div id="custom-amount-wrap" style="display:none;margin-bottom:2rem;text-align:center;">
+    <input id="custom-amount-input" type="number" min="1" placeholder="Enter amount ($)"
+      style="font-family:'Archivo Black',sans-serif;font-size:1.1rem;padding:0.8rem 1.4rem;
+             background:transparent;border:3px solid var(--amber);color:var(--cream);
+             text-align:center;width:200px;outline:none;letter-spacing:0.05em;" />
+  </div>
+  <button class="btn-give" id="donate-btn">Donate Now</button>
 </section>
+
+<!-- ── PAYPAL MODAL ── -->
+<div id="paypal-modal" style="display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(19,14,5,0.92);align-items:center;justify-content:center;">
+  <div style="background:var(--paper);padding:2.5rem 2rem;max-width:420px;width:90%;
+              border:4px solid var(--amber);position:relative;text-align:center;">
+    <button id="paypal-modal-close" style="position:absolute;top:12px;right:16px;
+      background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--ink);
+      font-family:'Archivo Black',sans-serif;">✕</button>
+    <div style="font-family:'Archivo Black',sans-serif;font-size:1.1rem;
+                letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.4rem;
+                color:var(--ink);">Supporting AVL Stonewall Fest</div>
+    <div id="paypal-modal-amount" style="font-size:2.4rem;font-weight:900;
+                color:var(--rust);margin-bottom:1.5rem;font-family:'Archivo Black',sans-serif;"></div>
+    <div id="paypal-container" style="min-height:48px;"></div>
+    <div id="paypal-success" style="display:none;padding:1.5rem 0;">
+      <div style="font-size:2rem;margin-bottom:0.5rem;">🏳️‍🌈</div>
+      <div style="font-family:'Archivo Black',sans-serif;font-size:1.1rem;color:var(--ink);">
+        Thank you for your support!
+      </div>
+      <div style="font-size:0.9rem;color:var(--charcoal);margin-top:0.4rem;">
+        You're helping make Asheville's pride celebration possible.
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ── FOOTER ── -->
 
@@ -1211,6 +1258,7 @@ to   { opacity: 1; transform: translateY(0); }
   </div>
   <div class="footer-bottom">
     <p>© 2026 AVL Stonewall Fest · All rights reserved</p>
+    <p style="margin-top:0.5rem;">AVL Stonewall Fest is produced and operated by <a href="https://butchout.org" target="_blank" rel="noopener" style="color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(212,135,10,0.4);">ButchOUT</a>, a registered nonprofit organization.</p>
     <p>Rooted in pride · Built by community · June 2026</p>
   </div>
 </footer>
@@ -1223,9 +1271,28 @@ to   { opacity: 1; transform: translateY(0); }
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
 
-  const SCENES      = [drawStonewall, drawMarch, drawCrowd, drawBar, drawProtest, drawPortrait];
-  const DOT_SPACING = 5;    /* tighter grid = more detail */
-  const DOT_RADIUS  = 2.2;  /* slightly smaller dots so grid stays visible */
+  // ── PHOTO URLS: replace with actual Stonewall/pride history photos from Pexels ──
+  // Pexels format: https://images.pexels.com/photos/{ID}/pexels-photo-{ID}.jpeg?auto=compress&cs=tinysrgb&w=1400
+  const PHOTO_URLS = [
+    'https://picsum.photos/seed/stonewall1/1400/900?grayscale',   // TODO: replace with Pexels Stonewall photo 1
+    'https://picsum.photos/seed/stonewall2/1400/900?grayscale',   // TODO: replace with Pexels Stonewall photo 2
+    'https://picsum.photos/seed/stonewall3/1400/900?grayscale',   // TODO: replace with Pexels Stonewall photo 3
+    'https://picsum.photos/seed/stonewall4/1400/900?grayscale',   // TODO: replace with Pexels Stonewall photo 4
+    'https://picsum.photos/seed/stonewall5/1400/900?grayscale',   // TODO: replace with Pexels Stonewall photo 5
+    'https://picsum.photos/seed/stonewall6/1400/900?grayscale',   // TODO: replace with Pexels Stonewall photo 6
+  ];
+
+  // Preload all images
+  const LOADED_IMGS = PHOTO_URLS.map(url => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = url;
+    return img;
+  });
+
+  const SCENES = LOADED_IMGS; // one entry per photo
+  const DOT_SPACING = 5;
+  const DOT_RADIUS  = 2.2;
   const FPS         = 24;
   const HOLD_MS     = 4000;
   const FADE_MS     = 1600;
@@ -1234,10 +1301,9 @@ to   { opacity: 1; transform: translateY(0); }
   let canvA, canvB, ctxA, ctxB, idA, idB;
   let sceneIdx  = 0;
   let startTime = null;
-  let phase     = 'hold'; // hold | fade
+  let phase     = 'hold';
   let raf;
 
-  /* ── Resize ── */
   function resize() {
     const section = canvas.closest('section') || canvas.parentElement;
     W = section.offsetWidth  || window.innerWidth;
@@ -1258,7 +1324,6 @@ to   { opacity: 1; transform: translateY(0); }
     ctxB  = canvB.getContext('2d');
   }
 
-  /* ── Draw dot grid sampling two image datas blended by alpha ── */
   function drawDots(a, b, t) {
     ctx.fillStyle = '#0a0703';
     ctx.fillRect(0, 0, W, H);
@@ -1270,27 +1335,22 @@ to   { opacity: 1; transform: translateY(0); }
         const py = Math.round(r * DOT_SPACING + DOT_SPACING * 0.5);
         const bA = brightness(a, px, py);
         const bB = brightness(b, px, py);
-        /* power curve to crush shadows, blow out highlights */
         const raw = bA * t + bB * (1 - t);
-        const bv  = Math.pow(raw, 0.65); /* gamma lift */
+        const bv  = Math.pow(raw, 0.65);
         const rad = bv * DOT_RADIUS;
         if (rad < 0.18) continue;
-        /* vivid sepia: dark=rust, mid=amber, bright=cream-white */
         let rv, gv, bk;
         if (bv < 0.35) {
-          /* shadows — deep rust */
           const s = bv / 0.35;
           rv = Math.round(80  + s * 120);
           gv = Math.round(20  + s * 55);
           bk = Math.round(5   + s * 10);
         } else if (bv < 0.7) {
-          /* midtones — bright amber */
           const s = (bv - 0.35) / 0.35;
           rv = Math.round(200 + s * 45);
           gv = Math.round(75  + s * 95);
           bk = Math.round(15  + s * 20);
         } else {
-          /* highlights — warm cream */
           const s = (bv - 0.7) / 0.3;
           rv = Math.min(255, Math.round(245 + s * 10));
           gv = Math.min(255, Math.round(170 + s * 60));
@@ -1312,20 +1372,16 @@ to   { opacity: 1; transform: translateY(0); }
     return (d[i] * 0.299 + d[i+1] * 0.587 + d[i+2] * 0.114) / 255;
   }
 
-  /* ── Animation loop ── */
   function loop(ts) {
     if (!startTime) startTime = ts;
     const elapsed = ts - startTime;
-
     if (phase === 'hold') {
       drawDots(idA, idB, 1);
       if (elapsed >= HOLD_MS) { phase = 'fade'; startTime = ts; }
-
     } else {
       const t = 1 - Math.min(elapsed / FADE_MS, 1);
       drawDots(idA, idB, t);
       if (t <= 0) {
-        /* swap A←B, paint new next into B */
         [canvA, canvB] = [canvB, canvA];
         [ctxA,  ctxB ] = [ctxB,  ctxA ];
         idA = ctxA.getImageData(0, 0, W, H);
@@ -1340,444 +1396,128 @@ to   { opacity: 1; transform: translateY(0); }
     raf = requestAnimationFrame(loop);
   }
 
-  /* ── Scene painter helper ── */
-  function paintScene(c, fn, w, h) {
+  // paintScene now draws a real image onto the offscreen canvas
+  function paintScene(c, img, w, h) {
     c.fillStyle = '#0a0703';
     c.fillRect(0, 0, w, h);
-    fn(c, w, h);
-  }
-
-  function sepia(lum) {
-    /* never fully black — lifts shadows to stay visible through dots */
-    const l = 0.12 + lum * 0.88;
-    const r = Math.min(255, Math.round(l * 255 * 1.20));
-    const g = Math.min(255, Math.round(l * 255 * 0.90));
-    const b = Math.min(255, Math.round(l * 255 * 0.55));
-    return `rgb(${r},${g},${b})`;
-  }
-
-  /* ═══ SCENE 1 — Stonewall Inn, night exterior ═══ */
-  function drawStonewall(c, w, h) {
-    /* night sky — blue-purple */
-    const sky=c.createLinearGradient(0,0,0,h*0.48);
-    sky.addColorStop(0,'#1a1f38'); sky.addColorStop(1,'#3c2c14');
-    c.fillStyle=sky; c.fillRect(0,0,w,h);
-    /* road */
-    const road=c.createLinearGradient(0,h*0.68,0,h);
-    road.addColorStop(0,'#3c3020'); road.addColorStop(1,'#201808');
-    c.fillStyle=road; c.fillRect(0,h*0.68,w,h);
-    /* building — warm stone */
-    c.fillStyle='#4a3c20'; c.fillRect(w*0.04,h*0.08,w*0.92,h*0.63);
-    /* bricks */
-    for(let row=0;row<28;row++){
-      const y=h*0.10+row*(h*0.020); const off=(row%2)*32;
-      for(let bx=-32+off;bx<w;bx+=64){
-        c.fillStyle=row%2===0?'#604a28':'#503c1e';
-        c.fillRect(bx+2,y+1,60,h*0.016);
-      }
-      c.fillStyle='#281c0a'; c.fillRect(0,y,w,1);
-    }
-    /* windows — lit warm gold */
-    [[0.08,0.13],[0.22,0.13],[0.36,0.13],[0.52,0.13],[0.66,0.13],[0.80,0.13],
-     [0.08,0.31],[0.22,0.31],[0.36,0.31],[0.52,0.31],[0.66,0.31],[0.80,0.31]].forEach(([fx,fy])=>{
-      const wg=c.createRadialGradient(w*fx+w*0.055,h*fy+h*0.04,0,w*fx+w*0.055,h*fy+h*0.04,w*0.09);
-      wg.addColorStop(0,'rgba(240,160,40,0.55)'); wg.addColorStop(1,'transparent');
-      c.fillStyle=wg; c.fillRect(w*fx-w*0.02,h*fy-h*0.015,w*0.16,h*0.12);
-      c.fillStyle='#201408'; c.fillRect(w*fx,h*fy,w*0.11,h*0.085);
-      c.fillStyle='#e09828'; c.fillRect(w*fx+2,h*fy+2,w*0.11-4,h*0.085-4);
-      c.fillStyle='#201408';
-      c.fillRect(w*fx+w*0.055-1,h*fy,2,h*0.085);
-      c.fillRect(w*fx,h*fy+h*0.042-1,w*0.11,2);
-    });
-    /* awning — red/white stripes */
-    for(let s=0;s<12;s++){
-      c.fillStyle=s%2===0?'#a01010':'#f0ece0';
-      const x1=w*0.05+s*(w*0.9/12);
-      c.beginPath();
-      c.moveTo(x1,h*0.55); c.lineTo(x1+w*0.9/12,h*0.55);
-      c.lineTo(x1+w*0.9/12-w*0.015,h*0.64); c.lineTo(x1-w*0.005,h*0.64);
-      c.closePath(); c.fill();
-    }
-    /* sign — bright yellow */
-    c.fillStyle='#f0e040'; c.fillRect(w*0.24,h*0.535,w*0.52,h*0.052);
-    c.fillStyle='#181008';
-    c.font=`bold ${Math.round(h*0.036)}px serif`;
-    c.textAlign='center'; c.textBaseline='middle';
-    c.fillText('STONEWALL INN',w*0.5,h*0.561);
-    /* streetlamps + glow */
-    [0.12,0.5,0.88].forEach(lx=>{
-      const lg=c.createRadialGradient(w*lx,h*0.5,0,w*lx,h*0.5,w*0.2);
-      lg.addColorStop(0,'rgba(255,200,80,0.6)'); lg.addColorStop(1,'transparent');
-      c.fillStyle=lg; c.fillRect(0,0,w,h);
-      c.fillStyle='#302010'; c.fillRect(w*lx-3,h*0.42,6,h*0.15);
-      c.fillStyle='#fff5a0'; c.beginPath(); c.arc(w*lx,h*0.42,9,0,Math.PI*2); c.fill();
-    });
-    /* crowd silhouettes */
-    for(let i=0;i<24;i++){
-      const px=w*(0.02+i*0.041), py=h*(0.71+Math.sin(i*0.9)*0.012);
-      const hh=h*(0.026+Math.random()*0.012);
-      c.fillStyle='#181208';
-      c.beginPath(); c.ellipse(px,py-hh,hh*0.62,hh*0.62,0,0,Math.PI*2); c.fill();
-      c.fillRect(px-hh*0.42,py-hh*0.08,hh*0.84,hh*2.3);
-      if(i%4===0){ /* raised fist */
-        c.strokeStyle='#181208'; c.lineWidth=2;
-        c.beginPath(); c.moveTo(px,py+hh*0.5); c.lineTo(px-hh*0.9,py-hh*0.5); c.stroke();
-        c.beginPath(); c.ellipse(px-hh*0.9,py-hh*0.7,hh*0.32,hh*0.32,0,0,Math.PI*2); c.fill();
-      }
+    if (img.complete && img.naturalWidth > 0) {
+      // cover-fit: fill canvas maintaining aspect ratio
+      const scale = Math.max(w / img.naturalWidth, h / img.naturalHeight);
+      const dw = img.naturalWidth  * scale;
+      const dh = img.naturalHeight * scale;
+      const dx = (w - dw) / 2;
+      const dy = (h - dh) / 2;
+      // convert to grayscale via filter
+      c.filter = 'grayscale(1) contrast(1.15) brightness(0.95)';
+      c.drawImage(img, dx, dy, dw, dh);
+      c.filter = 'none';
+    } else {
+      // image not yet loaded — retry when ready
+      img.onload = () => { resize(); };
     }
   }
 
-  /* ═══ SCENE 2 — Protest march, bright daytime ═══ */
-  function drawMarch(c, w, h) {
-    const sky=c.createLinearGradient(0,0,0,h*0.38);
-    sky.addColorStop(0,'#7090c0'); sky.addColorStop(1,'#c8b880');
-    c.fillStyle=sky; c.fillRect(0,0,w,h);
-    /* asphalt */
-    c.fillStyle='#685848'; c.fillRect(0,h*0.38,w,h);
-    for(let i=0;i<9;i++){ c.fillStyle='#786858'; c.fillRect(0,h*(0.38+i*0.07),w,h*0.005); }
-    /* centre lane line */
-    c.fillStyle='#f0e060';
-    for(let i=0;i<8;i++) c.fillRect(w*0.49,h*(0.38+i*0.08),w*0.02,h*0.04);
-    /* bg buildings */
-    [[0.0,0.26,0.16,'#504030'],[0.16,0.32,0.22,'#403828'],[0.38,0.22,0.2,'#4a3c28'],
-     [0.60,0.34,0.18,'#382e1c'],[0.80,0.28,0.2,'#483a24']].forEach(([x,ht,wd,col])=>{
-      c.fillStyle=col; c.fillRect(w*x,h*(0.38-ht),w*wd,h*ht);
-      for(let wr=0;wr<Math.round(ht*10);wr++)
-        for(let wc=0;wc<3;wc++){
-          c.fillStyle=Math.random()>0.45?'#d8a838':'#2a1e0e';
-          c.fillRect(w*x+w*wd*0.12+wc*w*wd*0.27,h*(0.40-ht)+wr*h*0.034,w*wd*0.17,h*0.024);
-        }
-    });
-    /* vivid banners */
-    const bdata=[['EQUALITY','#c01010','#f8f0b0'],['PRIDE','#1040c0','#f8f020'],
-                 ['STONEWALL','#f8e010','#181008'],['RESIST','#18a028','#f0f0f0'],
-                 ['UNITY','#901090','#f8f8f8'],['LOVE IS LOVE','#c01010','#f8f0b0']];
-    bdata.forEach((b,i)=>{
-      const bx=w*(0.01+i*0.163), by=h*(0.03+Math.sin(i*1.2)*0.055);
-      c.save(); c.translate(bx+w*0.075,by+h*0.058);
-      c.rotate((i%2===0?1:-1)*0.05);
-      c.fillStyle=b[1]; c.fillRect(-w*0.075,-h*0.058,w*0.15,h*0.116);
-      /* border */
-      c.strokeStyle=b[2]; c.lineWidth=2; c.strokeRect(-w*0.075,-h*0.058,w*0.15,h*0.116);
-      c.fillStyle=b[2]; c.font=`900 ${Math.round(h*0.034)}px sans-serif`;
-      c.textAlign='center'; c.textBaseline='middle'; c.fillText(b[0],0,0);
-      c.restore();
-      c.strokeStyle='#503820'; c.lineWidth=3;
-      c.beginPath(); c.moveTo(bx+w*0.075,by+h*0.116); c.lineTo(bx+w*0.075,h*0.80); c.stroke();
-    });
-    /* crowd rows */
-    for(let row=0;row<12;row++)
-      for(let col=0;col<28;col++){
-        const px=w*(0.01+col*0.036)+Math.sin(row*0.7+col)*4;
-        const py=h*(0.40+row*0.048);
-        const sz=h*(0.019+Math.random()*0.009);
-        const lum=0.32+row*0.035+Math.random()*0.22;
-        c.fillStyle=sepia(lum);
-        c.beginPath(); c.ellipse(px,py-sz,sz*0.68,sz*0.68,0,0,Math.PI*2); c.fill();
-        c.fillStyle=sepia(lum*0.68); c.fillRect(px-sz*0.44,py-sz*0.08,sz*0.88,sz*1.65);
-        if(Math.random()>0.52){ c.fillStyle=sepia(lum*0.45); c.fillRect(px-sz*0.68,py-sz*1.05,sz*1.36,sz*0.48); }
-      }
-  }
+  window.addEventListener('resize', resize);
 
-  /* ═══ SCENE 3 — Greenwich Village, dusk streets ═══ */
-  function drawCrowd(c, w, h) {
-    const sky=c.createLinearGradient(0,0,0,h*0.5);
-    sky.addColorStop(0,'#3a2850'); sky.addColorStop(0.4,'#c05518'); sky.addColorStop(1,'#e89530');
-    c.fillStyle=sky; c.fillRect(0,0,w,h);
-    c.fillStyle='#504030'; c.fillRect(0,h*0.58,w,h);
-    /* building silhouettes */
-    [[0,0.55,0.15,'#1c1410'],[0.15,0.48,0.13,'#201810'],[0.28,0.62,0.21,'#181210'],
-     [0.49,0.50,0.15,'#1c1610'],[0.64,0.57,0.17,'#201810'],[0.81,0.44,0.19,'#181410']].forEach(([x,ht,wd,col])=>{
-      c.fillStyle=col; c.fillRect(w*x,h*(1-ht),w*wd,h*ht);
-      for(let wr=0;wr<Math.round(ht*12);wr++)
-        for(let wc=0;wc<Math.round(wd*9);wc++)
-          if(Math.random()>0.48){
-            c.fillStyle=Math.random()>0.3?'#e0a028':'#c07820';
-            c.fillRect(w*x+w*wd*0.08+wc*w*wd*0.19,h*(1-ht)+h*0.02+wr*h*0.042,w*wd*0.13,h*0.028);
-          }
-    });
-    /* crowd in street */
-    for(let i=0;i<180;i++){
-      const px=Math.random()*w, py=h*0.59+Math.random()*h*0.38;
-      const sz=h*0.022+Math.random()*h*0.024; const lum=0.28+Math.random()*0.58;
-      c.fillStyle=sepia(lum); c.beginPath(); c.ellipse(px,py-sz,sz*0.64,sz*0.64,0,0,Math.PI*2); c.fill();
-      c.fillStyle=sepia(lum*0.64); c.fillRect(px-sz*0.48,py-sz*0.05,sz*0.96,sz*1.75);
-    }
-    /* streetlamp glows */
-    [0.12,0.38,0.64,0.88].forEach(lx=>{
-      const lg=c.createRadialGradient(w*lx,h*0.48,0,w*lx,h*0.48,w*0.15);
-      lg.addColorStop(0,'rgba(255,180,50,0.65)'); lg.addColorStop(1,'transparent');
-      c.fillStyle=lg; c.fillRect(0,0,w,h);
-      c.fillStyle='#281808'; c.fillRect(w*lx-3,h*0.42,6,h*0.18);
-      c.fillStyle='#fff8b0'; c.beginPath(); c.arc(w*lx,h*0.42,8,0,Math.PI*2); c.fill();
-    });
+  // Wait for at least the first two images to load before starting
+  let imgsReady = 0;
+  function onImgReady() {
+    imgsReady++;
+    if (imgsReady === 2) { resize(); requestAnimationFrame(loop); }
   }
+  LOADED_IMGS[0].addEventListener('load', onImgReady);
+  LOADED_IMGS[0].addEventListener('error', onImgReady);
+  LOADED_IMGS[1].addEventListener('load', onImgReady);
+  LOADED_IMGS[1].addEventListener('error', onImgReady);
+  // If already cached
+  if (LOADED_IMGS[0].complete) onImgReady();
+  if (LOADED_IMGS[1].complete) onImgReady();
 
-  /* ═══ SCENE 4 — Bar interior ═══ */
-  function drawBar(c, w, h) {
-    /* ceiling with wood beams */
-    const ceil=c.createLinearGradient(0,0,0,h*0.3);
-    ceil.addColorStop(0,'#2e2010'); ceil.addColorStop(1,'#3e2e16');
-    c.fillStyle=ceil; c.fillRect(0,0,w,h*0.3);
-    for(let i=0;i<7;i++){ c.fillStyle='#1e1408'; c.fillRect(w*(0.05+i*0.14)-w*0.024,0,w*0.048,h*0.28); }
-    /* wall — warm brick */
-    c.fillStyle='#503820'; c.fillRect(0,h*0.28,w,h*0.38);
-    for(let row=0;row<9;row++){
-      const y=h*0.29+row*h*0.038; const off=(row%2)*36;
-      for(let bx=-36+off;bx<w;bx+=72){
-        c.fillStyle=row%2===0?'#644228':'#503820';
-        c.fillRect(bx+2,y+1,68,h*0.032);
-      }
-    }
-    /* mirror — bright silvery */
-    c.fillStyle='#b0c8d0'; c.fillRect(w*0.05,h*0.30,w*0.9,h*0.25);
-    const ms=c.createLinearGradient(0,h*0.3,w*0.5,h*0.55);
-    ms.addColorStop(0,'rgba(255,255,255,0.35)'); ms.addColorStop(1,'rgba(180,220,255,0.15)');
-    c.fillStyle=ms; c.fillRect(w*0.05,h*0.30,w*0.9,h*0.25);
-    /* mirror frame */
-    c.strokeStyle='#a08030'; c.lineWidth=6; c.strokeRect(w*0.05,h*0.30,w*0.9,h*0.25);
-    /* shelf */
-    c.fillStyle='#906a28'; c.fillRect(0,h*0.52,w,h*0.018);
-    /* bottles — vivid colors */
-    const bcols=['#c02810','#1a7030','#1a3898','#9a6808','#681890','#106898'];
-    for(let i=0;i<22;i++){
-      const bx=w*(0.025+i*0.044), bh=h*(0.09+Math.random()*0.10);
-      c.fillStyle=bcols[i%bcols.length]; c.fillRect(bx,h*0.52-bh,w*0.034,bh);
-      /* label */
-      c.fillStyle='rgba(255,240,200,0.85)'; c.fillRect(bx+2,h*0.52-bh*0.58,w*0.034-4,bh*0.28);
-    }
-    /* bar counter */
-    c.fillStyle='#2a1a0a'; c.fillRect(0,h*0.65,w,h*0.15);
-    c.fillStyle='#c89018'; c.fillRect(0,h*0.65,w,h*0.016);
-    /* floor */
-    c.fillStyle='#382c14'; c.fillRect(0,h*0.80,w,h);
-    for(let i=0;i<10;i++){ c.fillStyle=i%2===0?'#403214':'#2e2410'; c.fillRect(w*i*0.1,h*0.80,w*0.1,h); }
-    /* stools */
-    for(let i=0;i<9;i++){
-      const sx=w*(0.04+i*0.107);
-      c.fillStyle='#882810'; c.beginPath(); c.ellipse(sx,h*0.65,w*0.038,h*0.018,0,0,Math.PI*2); c.fill();
-      c.strokeStyle='#c09020'; c.lineWidth=3;
-      c.beginPath(); c.moveTo(sx-w*0.02,h*0.668); c.lineTo(sx-w*0.024,h*0.80); c.stroke();
-      c.beginPath(); c.moveTo(sx+w*0.02,h*0.668); c.lineTo(sx+w*0.024,h*0.80); c.stroke();
-      c.beginPath(); c.moveTo(sx-w*0.022,h*0.73); c.lineTo(sx+w*0.022,h*0.73); c.stroke();
-    }
-    /* patrons */
-    for(let i=0;i<8;i++){
-      const px=w*(0.055+i*0.125); const lum=0.38+Math.random()*0.35;
-      c.fillStyle=sepia(lum); c.beginPath(); c.ellipse(px,h*0.59,h*0.03,h*0.03,0,0,Math.PI*2); c.fill();
-      c.fillStyle=sepia(lum*0.72); c.fillRect(px-h*0.024,h*0.59,h*0.048,h*0.07);
-      c.strokeStyle=sepia(0.7); c.lineWidth=3;
-      c.beginPath(); c.moveTo(px+h*0.02,h*0.61); c.lineTo(px+h*0.065,h*0.645); c.stroke();
-      c.fillStyle='rgba(220,190,90,0.85)'; c.fillRect(px+h*0.06,h*0.642,h*0.02,h*0.024);
-    }
-    /* warm ceiling light halos */
-    for(let i=0;i<7;i++){
-      const lx=w*(0.06+i*0.145);
-      const lg=c.createRadialGradient(lx,h*0.2,0,lx,h*0.2,w*0.16);
-      lg.addColorStop(0,'rgba(255,170,50,0.55)'); lg.addColorStop(1,'transparent');
-      c.fillStyle=lg; c.fillRect(0,0,w,h*0.5);
-      c.fillStyle='#ffe070'; c.beginPath(); c.arc(lx,h*0.2,6,0,Math.PI*2); c.fill();
-    }
-  }
-
-  /* ═══ SCENE 5 — Newspaper front page ═══ */
-  function drawProtest(c, w, h) {
-    /* aged newsprint */
-    c.fillStyle='#d8bc7a'; c.fillRect(0,0,w,h);
-    for(let i=0;i<44;i++){
-      c.fillStyle=`rgba(${190+i},${148+i},${60+i*0.4},${0.1+i*0.004})`;
-      c.fillRect(0,h*0.023*i,w,h*0.020);
-    }
-    /* masthead */
-    c.fillStyle='#0e0a04'; c.fillRect(w*0.02,h*0.03,w*0.96,h*0.11);
-    c.fillStyle='#f0d830';
-    c.font=`900 ${Math.round(h*0.072)}px serif`;
-    c.textAlign='center'; c.textBaseline='middle';
-    c.fillText('THE VILLAGE VOICE',w*0.5,h*0.085);
-    /* date bar */
-    c.fillStyle='#0e0a04'; c.fillRect(w*0.02,h*0.145,w*0.96,h*0.022);
-    c.fillStyle='#ecdda0';
-    c.font=`${Math.round(h*0.013)}px serif`;
-    c.fillText('NEW YORK · SATURDAY, JUNE 28, 1969 · PRICE: 25¢',w*0.5,h*0.156);
-    /* headline block */
-    c.fillStyle='#0e0a04'; c.fillRect(w*0.02,h*0.175,w*0.96,h*0.17);
-    c.fillStyle='#e81010';
-    c.font=`900 ${Math.round(h*0.105)}px sans-serif`;
-    c.textAlign='center'; c.textBaseline='middle';
-    c.fillText('STONEWALL',w*0.5,h*0.237);
-    c.fillStyle='#f0e830';
-    c.font=`bold ${Math.round(h*0.034)}px serif`;
-    c.fillText('RIOTS ERUPT IN GREENWICH VILLAGE',w*0.5,h*0.316);
-    /* subhead */
-    c.fillStyle='#1e1408';
-    c.font=`italic ${Math.round(h*0.022)}px serif`;
-    c.fillText('Police Clash With Hundreds Outside Christopher Street Bar',w*0.5,h*0.360);
-    /* rule */
-    c.strokeStyle='#0e0a04'; c.lineWidth=2;
-    c.beginPath(); c.moveTo(w*0.02,h*0.378); c.lineTo(w*0.98,h*0.378); c.stroke();
-    /* photo box */
-    c.fillStyle='#b09860'; c.fillRect(w*0.03,h*0.388,w*0.4,h*0.33);
-    c.strokeStyle='#0e0a04'; c.lineWidth=1; c.strokeRect(w*0.03,h*0.388,w*0.4,h*0.33);
-    for(let i=0;i<35;i++){
-      const px=w*0.03+Math.random()*w*0.4, py=h*0.388+Math.random()*h*0.33;
-      const sz=h*0.022+Math.random()*h*0.022;
-      c.fillStyle=sepia(0.22+Math.random()*0.52);
-      c.beginPath(); c.ellipse(px,py,sz*0.62,sz*0.62,0,0,Math.PI*2); c.fill();
-      c.fillStyle=sepia(0.18+Math.random()*0.35); c.fillRect(px-sz*0.42,py+sz*0.5,sz*0.84,sz*1.5);
-    }
-    c.fillStyle='#0e0a04'; c.font=`italic ${Math.round(h*0.015)}px serif`; c.textAlign='left';
-    c.fillText('Scene outside the Stonewall Inn · June 28, 1969',w*0.035,h*0.728);
-    /* text column */
-    c.textAlign='left'; c.fillStyle='#1a1008'; c.font=`${Math.round(h*0.019)}px serif`;
-    ['Hundreds of protesters clashed with','police outside the Stonewall Inn in',
-     'Greenwich Village late Friday night','in what witnesses called the most',
-     'significant act of resistance the','gay community has ever staged in the',
-     'history of New York City.','',
-     'The uprising began when officers','moved to arrest bar patrons, prompt-',
-     'ing crowds to fight back. The scene','spread across Christopher Street.'].forEach((line,i)=>{
-      c.fillText(line,w*0.46,h*(0.398+i*h*0.000050*h));
-    });
-    c.strokeStyle='#0e0a04'; c.lineWidth=1;
-    c.beginPath(); c.moveTo(w*0.44,h*0.378); c.lineTo(w*0.44,h*0.755); c.stroke();
-    c.beginPath(); c.moveTo(w*0.02,h*0.755); c.lineTo(w*0.98,h*0.755); c.stroke();
-  }
-
-  /* ═══ SCENE 6 — Close portrait, candlelight ═══ */
-  function drawPortrait(c, w, h) {
-    c.fillStyle='#120d06'; c.fillRect(0,0,w,h);
-    /* warm ambient */
-    const amb=c.createRadialGradient(w*0.5,h*0.42,0,w*0.5,h*0.42,w*0.7);
-    amb.addColorStop(0,'rgba(140,80,20,0.6)'); amb.addColorStop(1,'transparent');
-    c.fillStyle=amb; c.fillRect(0,0,w,h);
-    /* bg figures */
-    for(let i=0;i<45;i++){
-      const px=Math.random()*w, py=Math.random()*h;
-      c.fillStyle=sepia(0.12+Math.random()*0.22);
-      c.beginPath(); c.ellipse(px,py,h*0.06,h*0.06,0,0,Math.PI*2); c.fill();
-    }
-    const fx=w*0.5, fy=h*0.40, fr=h*0.27;
-    /* shoulders */
-    const sg=c.createLinearGradient(fx-fr*1.4,fy+fr,fx+fr*1.4,fy+fr);
-    sg.addColorStop(0,sepia(0.08)); sg.addColorStop(0.5,sepia(0.40)); sg.addColorStop(1,sepia(0.08));
-    c.fillStyle=sg; c.fillRect(fx-fr*1.4,fy+fr*0.9,fr*2.8,fr*0.95);
-    c.fillStyle=sepia(0.45); c.fillRect(fx-fr*0.28,fy+fr*0.84,fr*0.56,fr*0.52);
-    /* face — side lit */
-    const fg2=c.createRadialGradient(fx-fr*0.18,fy-fr*0.08,0,fx,fy,fr*1.08);
-    fg2.addColorStop(0,sepia(0.80)); fg2.addColorStop(0.35,sepia(0.62));
-    fg2.addColorStop(0.72,sepia(0.32)); fg2.addColorStop(1,sepia(0.10));
-    c.fillStyle=fg2;
-    c.beginPath(); c.ellipse(fx,fy,fr*0.74,fr,0,0,Math.PI*2); c.fill();
-    /* bright cheek highlight */
-    const hl=c.createRadialGradient(fx-fr*0.22,fy-fr*0.04,0,fx-fr*0.22,fy-fr*0.04,fr*0.42);
-    hl.addColorStop(0,'rgba(255,215,130,0.62)'); hl.addColorStop(1,'transparent');
-    c.fillStyle=hl; c.beginPath(); c.ellipse(fx,fy,fr*0.74,fr,0,0,Math.PI*2); c.fill();
-    /* eyes */
-    [-1,1].forEach(s=>{
-      const ex=fx+s*fr*0.27, ey=fy-fr*0.13;
-      c.fillStyle='rgba(10,6,2,0.65)'; c.beginPath(); c.ellipse(ex,ey,fr*0.19,fr*0.13,0,0,Math.PI*2); c.fill();
-      c.fillStyle=sepia(0.62); c.beginPath(); c.ellipse(ex,ey,fr*0.10,fr*0.11,0,0,Math.PI*2); c.fill();
-      c.fillStyle='#060402'; c.beginPath(); c.ellipse(ex,ey,fr*0.052,fr*0.056,0,0,Math.PI*2); c.fill();
-      /* catchlight */
-      c.fillStyle='rgba(255,235,160,0.95)'; c.beginPath(); c.ellipse(ex-fr*0.026,ey-fr*0.03,fr*0.02,fr*0.02,0,0,Math.PI*2); c.fill();
-      /* brow */
-      c.strokeStyle=sepia(0.28); c.lineWidth=fr*0.038;
-      c.beginPath(); c.arc(ex,ey-fr*0.15,fr*0.16,-Math.PI*0.78,-Math.PI*0.22); c.stroke();
-    });
-    /* nose */
-    c.strokeStyle=sepia(0.22); c.lineWidth=fr*0.032;
-    c.beginPath(); c.moveTo(fx,fy-fr*0.08); c.lineTo(fx-fr*0.08,fy+fr*0.26); c.stroke();
-    c.beginPath(); c.arc(fx-fr*0.12,fy+fr*0.28,fr*0.07,0,Math.PI); c.stroke();
-    c.beginPath(); c.arc(fx+fr*0.04,fy+fr*0.28,fr*0.07,0,Math.PI); c.stroke();
-    /* mouth */
-    c.strokeStyle=sepia(0.20); c.lineWidth=fr*0.042;
-    c.beginPath(); c.arc(fx,fy+fr*0.48,fr*0.20,0.16,Math.PI-0.16); c.stroke();
-    c.beginPath(); c.moveTo(fx-fr*0.20,fy+fr*0.48); c.lineTo(fx+fr*0.20,fy+fr*0.48); c.stroke();
-    /* hair */
-    c.fillStyle=sepia(0.20);
-    c.beginPath(); c.ellipse(fx,fy-fr*0.84,fr*0.76,fr*0.46,0,Math.PI,0); c.fill();
-    c.beginPath(); c.ellipse(fx-fr*0.73,fy+fr*0.12,fr*0.23,fr*0.56,0.28,0,Math.PI*2); c.fill();
-    c.beginPath(); c.ellipse(fx+fr*0.73,fy+fr*0.12,fr*0.23,fr*0.56,-0.28,0,Math.PI*2); c.fill();
-    /* rim glow */
-    const rim=c.createRadialGradient(fx,fy,fr*0.62,fx,fy,fr*1.35);
-    rim.addColorStop(0,'transparent'); rim.addColorStop(0.7,'rgba(190,85,12,0.28)'); rim.addColorStop(1,'transparent');
-    c.fillStyle=rim; c.beginPath(); c.ellipse(fx,fy,fr*0.74,fr,0,0,Math.PI*2); c.fill();
-    /* vignette */
-    const vig=c.createRadialGradient(fx,fy,fr*0.58,fx,fy,fr*3.4);
-    vig.addColorStop(0,'transparent'); vig.addColorStop(0.62,'rgba(8,5,2,0.65)'); vig.addColorStop(1,'rgba(4,2,1,0.98)');
-    c.fillStyle=vig; c.fillRect(0,0,w,h);
-  }
-    /* road */
-    c.fillStyle = '#0e0a05'; c.fillRect(0, h * 0.7, w, h);
-    /* building face */
-    c.fillStyle = '#1a1208'; c.fillRect(w*0.04, h*0.1, w*0.92, h*0.62);
-    /* bricks */
-    for (let row = 0; row < 24; row++) {
-      const y   = h*0.12 + row*(h*0.024);
-      const off = (row%2)*30;
-      for (let bx = -30+off; bx < w; bx += 60) {
-        c.fillStyle = row%3===0 ? '#281c09' : '#201508';
-        c.fillRect(bx+2, y+1, 56, h*0.02);
-      }
-    }
-    /* windows */
-    [[0.1,0.16],[0.28,0.16],[0.46,0.16],[0.64,0.16],[0.82,0.16],
-     [0.1,0.36],[0.28,0.36],[0.46,0.36],[0.64,0.36],[0.82,0.36]].forEach(([fx,fy])=>{
-      c.fillStyle='#3a2c0c'; c.fillRect(w*fx,h*fy,w*0.13,h*0.09);
-      c.fillStyle='#4e3c10'; c.fillRect(w*fx+3,h*fy+3,w*0.13-6,h*0.09-6);
-    });
-    /* awning */
-    c.fillStyle='#2e2008';
-    c.beginPath(); c.moveTo(w*0.06,h*0.57); c.lineTo(w*0.94,h*0.57);
-    c.lineTo(w*0.9,h*0.66); c.lineTo(w*0.1,h*0.66); c.closePath(); c.fill();
-    for(let s=0;s<9;s++){
-      c.fillStyle = s%2===0?'#3e2e0c':'#251a07';
-      const x1=w*0.06+s*(w*0.88/9);
-      c.beginPath(); c.moveTo(x1,h*0.57); c.lineTo(x1+w*0.88/9,h*0.57);
-      c.lineTo(x1+w*0.88/9-w*0.025,h*0.66); c.lineTo(x1,h*0.66); c.closePath(); c.fill();
-    }
-    /* sign */
-    c.fillStyle='#50400f'; c.fillRect(w*0.28,h*0.54,w*0.44,h*0.055);
-    c.fillStyle='#c8a030'; c.font=`bold ${Math.round(h*0.036)}px serif`;
-    c.textAlign='center'; c.textBaseline='middle';
-    c.fillText('STONEWALL INN', w*0.5, h*0.568);
-    /* street crowd silhouettes */
-    for(let i=0;i<20;i++){
-      const px=w*(0.03+i*0.048), py=h*0.72;
-      const hd=h*(0.016+Math.random()*0.008);
-      c.fillStyle='#0c0906';
-      c.beginPath(); c.ellipse(px,py-hd,hd*0.7,hd*0.7,0,0,Math.PI*2); c.fill();
-      c.fillRect(px-hd*0.4,py-hd*0.1,hd*0.8,h*0.06);
-    }
-  }
-  /* ── Boot ── */
-  function start() {
-    resize();
-    raf = requestAnimationFrame(loop);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', start);
-  } else {
-    setTimeout(start, 50);
-  }
-
-  window.addEventListener('resize', () => {
-    cancelAnimationFrame(raf);
-    resize();
-    raf = requestAnimationFrame(loop);
-  });
-
-})();
+);
 </script>
 
 <script>
+  // ── AMOUNT SELECTION ──
+  let selectedAmount = 10;
+
   document.querySelectorAll('.amt').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.amt').forEach(b => b.classList.remove('on'));
       btn.classList.add('on');
+      const val = btn.dataset.amount;
+      if (val === 'custom') {
+        document.getElementById('custom-amount-wrap').style.display = 'block';
+        const input = document.getElementById('custom-amount-input');
+        input.focus();
+        selectedAmount = parseFloat(input.value) || null;
+        input.addEventListener('input', () => {
+          selectedAmount = parseFloat(input.value) || null;
+        });
+      } else {
+        document.getElementById('custom-amount-wrap').style.display = 'none';
+        selectedAmount = parseFloat(val);
+      }
     });
   });
+
+  // ── PAYPAL MODAL ──
+  const modal = document.getElementById('paypal-modal');
+  const modalAmount = document.getElementById('paypal-modal-amount');
+  const ppContainer = document.getElementById('paypal-container');
+  const ppSuccess = document.getElementById('paypal-success');
+  let ppRendered = false;
+
+  document.getElementById('donate-btn').addEventListener('click', () => {
+    const amt = selectedAmount || parseFloat(document.getElementById('custom-amount-input').value);
+    if (!amt || amt < 1) {
+      alert('Please enter a valid donation amount.');
+      return;
+    }
+    selectedAmount = amt;
+    modalAmount.textContent = '$' + amt.toFixed(2);
+    ppContainer.innerHTML = '';
+    ppContainer.style.display = 'block';
+    ppSuccess.style.display = 'none';
+    modal.style.display = 'flex';
+    renderPayPal(amt);
+  });
+
+  document.getElementById('paypal-modal-close').addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.style.display = 'none';
+  });
+
+  function renderPayPal(amount) {
+    paypal.Buttons({
+      style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'donate' },
+      createOrder: (data, actions) => {
+        return actions.order.create({
+          purchase_units: [{
+            description: 'AVL Stonewall Fest Donation',
+            amount: {
+              currency_code: 'USD',
+              value: amount.toFixed(2)
+            }
+          }]
+        });
+      },
+      onApprove: (data, actions) => {
+        return actions.order.capture().then(() => {
+          ppContainer.style.display = 'none';
+          ppSuccess.style.display = 'block';
+        });
+      },
+      onError: (err) => {
+        console.error('PayPal error:', err);
+        ppContainer.innerHTML = '<p style="color:var(--rust);font-size:0.9rem;">Something went wrong. Please try again.</p>';
+      }
+    }).render('#paypal-container');
+  }
 </script>
+
+<script src="https://www.paypal.com/sdk/js?client-id=BAAkw9-XVL-_DcK7yc7QxpqOhVXFzI8Z4PpfpLcdxgbLFiQ6tAaUngiBPs-NcT2XUCWsL_ooltIEnsUsXU&enable-funding=venmo&currency=USD&intent=capture"></script>
 
 <script>
 /* ── STONEWALL: clean draw + 3 crisp echoes + letter sparks ── */
